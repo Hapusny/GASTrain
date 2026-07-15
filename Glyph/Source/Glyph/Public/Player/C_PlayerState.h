@@ -22,7 +22,7 @@ public:
 	UAbilitySystemComponent* GetAbilitySystemComponent();
 
 private:
-	UPROPERTY(VisibleAnywhere, Category = "C|Abilities")
+	UPROPERTY(VisibleAnywhere, Category = "C|Ability")
 	TObjectPtr<UAbilitySystemComponent>AbilitySystemComponent;
 	
 };
