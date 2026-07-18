@@ -7,6 +7,9 @@
 #include "AbilitySystemInterface.h"
 #include "C_BaseCharacter.generated.h"
 
+
+class UC_GlyphInventoryComponent;
+
 UCLASS()
 class GLYPH_API AC_BaseCharacter : public ACharacter, public IAbilitySystemInterface
 {
@@ -15,5 +18,8 @@ class GLYPH_API AC_BaseCharacter : public ACharacter, public IAbilitySystemInter
 public:
 	AC_BaseCharacter();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent()const override;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UC_GlyphInventoryComponent>GlyphInventoryComponent;
 
 };

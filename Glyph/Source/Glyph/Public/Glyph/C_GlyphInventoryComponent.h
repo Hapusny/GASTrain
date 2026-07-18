@@ -55,10 +55,7 @@ private:
 	UPROPERTY()
 	TArray<TWeakObjectPtr<UC_GlyphBase>>MoveSlot;
 
-	UC_GlyphBase* GetSlotContent(EGlyphType Type);
-
-	void SetSlotContent(UC_GlyphBase* TargetGlyph, EGlyphType TargetType);
-
-	void ClearSlotContent(EGlyphType Type);
+	//操作0为查询对应类型槽位内容；操作1为清空对应槽位，返回原先内容；操作2为将槽位置为目标刻印，返回原先内容
+	UC_GlyphBase* SlotContent(int Operation,EGlyphType Type, UC_GlyphBase* TargetGlyph = nullptr);
 
 };

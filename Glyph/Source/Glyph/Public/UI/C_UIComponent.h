@@ -6,6 +6,9 @@
 #include "Components/ActorComponent.h"
 #include "C_UIComponent.generated.h"
 
+class UC_GlyphInventoryWidget;
+
+enum class EGlyphType : uint8;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GLYPH_API UC_UIComponent : public UActorComponent
@@ -13,16 +16,24 @@ class GLYPH_API UC_UIComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UC_UIComponent();
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	virtual void BeginPlay()override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void ShowWidget();
 
-		
+	void CloseWidget();
+
+	UFUNCTION()
+	void OnGlyphInventoryChanged(bool bAdded, FName GlyphName);
+
+	UFUNCTION()
+	void OnGlyphTypeChanged(EGlyphType NewType, FName GlyphName);
+
+	UPROPERTY(EditDefaultsOnly, Category = "C|UI")
+	TSubclassOf<UC_GlyphInventoryWidget>GlyphInventoryWidgetClass;
+
+private:
+	UPROPERTY()
+	TObjectPtr<UC_GlyphInventoryWidget>GlyphInventoryWidget;
 };
