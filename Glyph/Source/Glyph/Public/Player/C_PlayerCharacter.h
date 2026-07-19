@@ -22,6 +22,6 @@ public:
 
 	virtual void BeginPlay()override;
 
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<UC_UIComponent>UIComponent;
 };

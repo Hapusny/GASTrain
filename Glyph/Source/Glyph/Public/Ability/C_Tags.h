@@ -6,5 +6,12 @@
 #include "NativeGameplayTags.h"
 
 namespace CTags {
+	namespace CAbilities
+	{
+		
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Attack);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Skill);
+		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Move);
 
+	}
 }

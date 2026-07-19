@@ -30,6 +30,12 @@ void UC_UIComponent::BeginPlay()
 	GlyphInventoryWidget = CreateWidget<UC_GlyphInventoryWidget>(PlayerController, GlyphInventoryWidgetClass);
 }
 
+bool UC_UIComponent::GetWidgetState()
+{
+	if (!GlyphInventoryWidget)return false;
+	return GlyphInventoryWidget->IsInViewport();
+}
+
 void UC_UIComponent::ShowWidget()
 {
 	if (!GlyphInventoryWidget)return;

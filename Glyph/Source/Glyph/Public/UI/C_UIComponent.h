@@ -10,7 +10,7 @@ class UC_GlyphInventoryWidget;
 
 enum class EGlyphType : uint8;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GLYPH_API UC_UIComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -19,6 +19,8 @@ public:
 	UC_UIComponent();
 
 	virtual void BeginPlay()override;
+
+	bool GetWidgetState();
 
 	void ShowWidget();
 
