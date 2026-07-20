@@ -25,7 +25,13 @@ void UC_GlyphInventoryComponent::AddGlyph(TSubclassOf<UC_GlyphBase> GlyphClass)
 void UC_GlyphInventoryComponent::RemoveGlyph(UC_GlyphBase* TargetGlyph)
 {
 	if (!TargetGlyph || !IsValid(TargetGlyph))return;
+
+	UnbindGlyph();
+
 	SlotContent(1,TargetGlyph->GlyphType);
+
+	BindGlyph();
+
 	if (GlyphInventory.RemoveSingle(TargetGlyph)) {
 		OnGlyphInventoryChange.Broadcast(false, TargetGlyph->GlyphName);
 	}
@@ -35,6 +41,9 @@ void UC_GlyphInventoryComponent::SetGlyphType(UC_GlyphBase* TargetGlyph, EGlyphT
 {
 	if (!TargetGlyph || !IsValid(TargetGlyph))return;
 	if (TargetType == TargetGlyph->GlyphType)return;
+
+	UnbindGlyph();
+
 	if (UC_GlyphBase* Content = SlotContent(0,TargetType)) {
 		SlotContent(2, TargetGlyph->GlyphType,Content);
 		Content->GlyphType = TargetGlyph->GlyphType;
@@ -44,14 +53,20 @@ void UC_GlyphInventoryComponent::SetGlyphType(UC_GlyphBase* TargetGlyph, EGlyphT
 	SlotContent(2, TargetType, TargetGlyph);
 	TargetGlyph->GlyphType = TargetType;
 	OnGlyphTypeChange.Broadcast(TargetType, TargetGlyph->GlyphName);
+
+	BindGlyph();
 }
 
 void UC_GlyphInventoryComponent::RemoveAllGlyph()
 {
+	UnbindGlyph();
+
 	for (UC_GlyphBase* Glyph : GlyphInventory){
 		OnGlyphInventoryChange.Broadcast(false, Glyph->GlyphName);
 		if (Glyph->GlyphType != EGlyphType::None)SlotContent(1,Glyph->GlyphType);
 	}
+
+	BindGlyph();
 	GlyphInventory.Empty();
 }
 
@@ -98,5 +113,38 @@ UC_GlyphBase* UC_GlyphInventoryComponent::SlotContent(int Operation, EGlyphType 
 	default:break;
 	}
 	return Glyph;
+}
+
+void UC_GlyphInventoryComponent::BindGlyph()
+{
+	UC_GlyphBase* Base, *Variant;
+	Base = AttackSlot[0].Get();
+	Variant = AttackSlot[1].Get();
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+
+	Base = SkillSlot[0].Get();
+	Variant = SkillSlot[1].Get();
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+
+	Base = MoveSlot[0].Get();
+	Variant = MoveSlot[1].Get();
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+
+}
+
+void UC_GlyphInventoryComponent::UnbindGlyph()
+{
+	UC_GlyphBase* Base, * Variant;
+	Base = AttackSlot[0].Get();
+	Variant = AttackSlot[1].Get();
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+
+	Base = SkillSlot[0].Get();
+	Variant = SkillSlot[1].Get();
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+
+	Base = MoveSlot[0].Get();
+	Variant = MoveSlot[1].Get();
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
 }
 
