@@ -3,6 +3,7 @@
 
 #include "Character/C_BaseCharacter.h"
 #include "Glyph/C_GlyphInventoryComponent.h"
+#include "AbilitySystemComponent.h"
 
 // Sets default values
 AC_BaseCharacter::AC_BaseCharacter()
@@ -14,4 +15,13 @@ AC_BaseCharacter::AC_BaseCharacter()
 UAbilitySystemComponent* AC_BaseCharacter::GetAbilitySystemComponent() const
 {
 	return nullptr;
+}
+
+void AC_BaseCharacter::GiveStartupAbilities()
+{
+	if (!IsValid(GetAbilitySystemComponent()))return;
+	for (const auto& Ability : StartupAbilities) {
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Ability);
+		GetAbilitySystemComponent()->GiveAbility(AbilitySpec);
+	}
 }

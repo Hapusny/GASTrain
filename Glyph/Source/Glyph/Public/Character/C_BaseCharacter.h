@@ -9,6 +9,7 @@
 
 
 class UC_GlyphInventoryComponent;
+class UGameplayAbility;
 
 UCLASS()
 class GLYPH_API AC_BaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -21,5 +22,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UC_GlyphInventoryComponent>GlyphInventoryComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "C|Ability")
+	TArray<TSubclassOf<UGameplayAbility>>StartupAbilities;
+
+protected:
+	void GiveStartupAbilities();
 
 };

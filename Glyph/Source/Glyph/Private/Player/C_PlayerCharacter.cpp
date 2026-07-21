@@ -20,4 +20,5 @@ UAbilitySystemComponent* AC_PlayerCharacter::GetAbilitySystemComponent() const
 void AC_PlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	GiveStartupAbilities();
 }
