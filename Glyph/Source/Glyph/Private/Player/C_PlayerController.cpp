@@ -47,6 +47,7 @@ void AC_PlayerController::Walk(const FInputActionValue& Value)
 
 void AC_PlayerController::Look(const FInputActionValue& Value)
 {
+	if (bLookingMenu)return;
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	AddYawInput(LookAxisVector.X);
@@ -76,12 +77,26 @@ void AC_PlayerController::Menu()
 	if (!IsValid(UIComponent))return;
 
 	//控件显示中则隐藏，反之显示
-	if (UIComponent->GetWidgetState())UIComponent->CloseWidget();
-	else UIComponent->ShowWidget();
+	if (UIComponent->GetWidgetState()) {
+		UIComponent->CloseWidget();
+		SetShowMouseCursor(false);
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+		bLookingMenu = false;
+	}
+	else {
+		UIComponent->ShowWidget();
+		SetShowMouseCursor(true);
+		FInputModeGameAndUI InputMode;
+		SetInputMode(InputMode);
+		bLookingMenu = true;
+	}
+	
 }
 
 void AC_PlayerController::ActivateAbility(const FGameplayTag& AbilityTag) const
 {
+	if (bLookingMenu)return;
 	AC_PlayerCharacter* PlayerCharacter = Cast<AC_PlayerCharacter>(GetPawn());
 	if (!IsValid(PlayerCharacter))return;
 	UAbilitySystemComponent* ASC = PlayerCharacter->GetAbilitySystemComponent();

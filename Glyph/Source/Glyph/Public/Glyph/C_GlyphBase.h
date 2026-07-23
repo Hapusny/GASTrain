@@ -62,7 +62,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBaseEventReceived, EBaseEventType,
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class GLYPH_API UC_GlyphBase : public UObject
 {
 	GENERATED_BODY()

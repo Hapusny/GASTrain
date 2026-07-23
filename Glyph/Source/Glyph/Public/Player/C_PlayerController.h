@@ -58,4 +58,6 @@ private:
 	void Menu();
 
 	void ActivateAbility(const FGameplayTag& AbilityTag)const;
+
+	bool bLookingMenu = false;
 };

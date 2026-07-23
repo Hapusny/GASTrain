@@ -30,7 +30,7 @@ public:
 	void OnGlyphInventoryChanged(bool bAdded, FName GlyphName);
 
 	UFUNCTION()
-	void OnGlyphTypeChanged(EGlyphType NewType, FName GlyphName);
+	void OnGlyphTypeChanged(EGlyphType NewType, FName GlyphName,EGlyphType OldType);
 
 	UPROPERTY(EditDefaultsOnly, Category = "C|UI")
 	TSubclassOf<UC_GlyphInventoryWidget>GlyphInventoryWidgetClass;

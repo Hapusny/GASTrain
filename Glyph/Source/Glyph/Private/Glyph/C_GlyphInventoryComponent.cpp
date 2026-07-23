@@ -28,7 +28,9 @@ void UC_GlyphInventoryComponent::RemoveGlyph(UC_GlyphBase* TargetGlyph)
 
 	UnbindGlyph();
 
+	//将原槽位置空
 	SlotContent(1,TargetGlyph->GlyphType);
+	OnGlyphTypeChange.Broadcast(EGlyphType::None, TargetGlyph->GlyphName, TargetGlyph->GlyphType);
 
 	BindGlyph();
 
@@ -46,13 +48,17 @@ void UC_GlyphInventoryComponent::SetGlyphType(UC_GlyphBase* TargetGlyph, EGlyphT
 
 	if (UC_GlyphBase* Content = SlotContent(0,TargetType)) {
 		SlotContent(2, TargetGlyph->GlyphType,Content);
+		OnGlyphTypeChange.Broadcast(TargetGlyph->GlyphType, Content->GlyphName, Content->GlyphType);
 		Content->GlyphType = TargetGlyph->GlyphType;
-		OnGlyphTypeChange.Broadcast(TargetGlyph->GlyphType, Content->GlyphName);
 	}
-	else SlotContent(1,TargetGlyph->GlyphType);//Content为nullptr时不做交换，仅将原槽位置空
+	else {
+		//Content为nullptr时不做交换，仅将原槽位置空
+		SlotContent(1, TargetGlyph->GlyphType);
+		OnGlyphTypeChange.Broadcast(EGlyphType::None, TargetGlyph->GlyphName, TargetGlyph->GlyphType);
+	}
 	SlotContent(2, TargetType, TargetGlyph);
+	OnGlyphTypeChange.Broadcast(TargetType, TargetGlyph->GlyphName, TargetGlyph->GlyphType);
 	TargetGlyph->GlyphType = TargetType;
-	OnGlyphTypeChange.Broadcast(TargetType, TargetGlyph->GlyphName);
 
 	BindGlyph();
 }
@@ -68,6 +74,14 @@ void UC_GlyphInventoryComponent::RemoveAllGlyph()
 
 	BindGlyph();
 	GlyphInventory.Empty();
+}
+
+UC_GlyphBase* UC_GlyphInventoryComponent::NameToGlyph(FName Name)
+{
+	for (UC_GlyphBase* Glyph : GlyphInventory) {
+		if (Glyph->GlyphName == Name)return Glyph;
+	}
+	return nullptr;
 }
 
 UC_GlyphBase* UC_GlyphInventoryComponent::CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass)

@@ -11,7 +11,7 @@ class UC_GlyphBase;
 enum class EGlyphType : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGlyphInventoryChange,bool,bIsAdd,FName,GlyphName);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGlyphTypeChange, EGlyphType,NewGlyphType , FName, GlyphName);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FGlyphTypeChange, EGlyphType,NewGlyphType , FName, GlyphName, EGlyphType, OldGlyphType);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GLYPH_API UC_GlyphInventoryComponent : public UActorComponent
@@ -38,6 +38,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "C|GlyphInventory")
 	FGlyphTypeChange OnGlyphTypeChange;
+
+	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
+	UC_GlyphBase* NameToGlyph(FName Name);
 
 protected:
 	UC_GlyphBase* CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass);

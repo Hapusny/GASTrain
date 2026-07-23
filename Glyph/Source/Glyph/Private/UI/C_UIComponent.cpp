@@ -54,8 +54,8 @@ void UC_UIComponent::OnGlyphInventoryChanged(bool bAdded, FName GlyphName)
 	GlyphInventoryWidget->GlyphInventoryChanged(bAdded, GlyphName);
 }
 
-void UC_UIComponent::OnGlyphTypeChanged(EGlyphType NewType, FName GlyphName)
+void UC_UIComponent::OnGlyphTypeChanged(EGlyphType NewType, FName GlyphName,EGlyphType OldType)
 {
 	if (!GlyphInventoryWidget)return;
-	GlyphInventoryWidget->GlyphTypeChanged(NewType, GlyphName);
+	GlyphInventoryWidget->GlyphTypeChanged(NewType, GlyphName,OldType);
 }

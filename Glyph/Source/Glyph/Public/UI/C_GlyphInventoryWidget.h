@@ -18,9 +18,9 @@ class GLYPH_API UC_GlyphInventoryWidget : public UUserWidget
 	
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintNativeEvent)
 	void GlyphInventoryChanged(bool bAdded, FName GlyphName);
 
-	UFUNCTION()
-	void GlyphTypeChanged(EGlyphType NewType, FName GlyphName);
+	UFUNCTION(BlueprintNativeEvent)
+	void GlyphTypeChanged(EGlyphType NewType, FName GlyphName,EGlyphType OldType);
 };
