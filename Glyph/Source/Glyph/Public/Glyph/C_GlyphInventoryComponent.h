@@ -7,7 +7,7 @@
 #include "C_GlyphInventoryComponent.generated.h"
 
 class UC_GlyphBase;
-
+class UGameplayAbility;
 enum class EGlyphType : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGlyphInventoryChange,bool,bIsAdd,FName,GlyphName);
@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
 	UC_GlyphBase* NameToGlyph(FName Name);
 
+	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
+	bool ActivateSlotGlyph(EGlyphType SlotType,UGameplayAbility* Ability);
+
 protected:
 	UC_GlyphBase* CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass);
 
@@ -61,4 +64,5 @@ private:
 	void BindGlyph();
 
 	void UnbindGlyph();
+
 };

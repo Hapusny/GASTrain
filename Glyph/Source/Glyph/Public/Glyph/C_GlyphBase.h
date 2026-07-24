@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "C_GlyphBase.generated.h"
 
+class UGameplayAbility;
+
 UENUM(BlueprintType)
 enum class EGlyphType : uint8
 {
@@ -68,7 +70,7 @@ class GLYPH_API UC_GlyphBase : public UObject
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, Category = "C|Glyph")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,Category = "C|Glyph")
 	FName GlyphName = FName("Base");
 
 	EGlyphType GlyphType = EGlyphType::None;
@@ -81,5 +83,8 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Variant")
 	void BaseEventReceived(EBaseEventType EventType, FBaseEventContext Context);
+
+	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph")
+	void ActivateGlyph(UGameplayAbility* Ability);
 
 };

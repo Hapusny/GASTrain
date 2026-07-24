@@ -3,6 +3,8 @@
 
 #include "Glyph/C_GlyphInventoryComponent.h"
 #include "Glyph/C_GlyphBase.h"
+#include "Abilities/GameplayAbility.h"
+#include "AbilitySystemComponent.h"
 
 UC_GlyphInventoryComponent::UC_GlyphInventoryComponent()
 {
@@ -84,6 +86,15 @@ UC_GlyphBase* UC_GlyphInventoryComponent::NameToGlyph(FName Name)
 	return nullptr;
 }
 
+bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGameplayAbility* Ability)
+{
+	if (SlotType != EGlyphType::AttackBase && SlotType != EGlyphType::SkillBase && SlotType != EGlyphType::MoveBase) return false;
+	UC_GlyphBase* TargetGlyph = SlotContent(0, SlotType);
+	if (!IsValid(TargetGlyph))return false;
+	TargetGlyph->ActivateGlyph(Ability);
+	return true;
+}
+
 UC_GlyphBase* UC_GlyphInventoryComponent::CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass)
 {
 	if (!GlyphClass)return nullptr;
@@ -161,4 +172,3 @@ void UC_GlyphInventoryComponent::UnbindGlyph()
 	Variant = MoveSlot[1].Get();
 	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
 }
-

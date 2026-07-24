@@ -5,6 +5,7 @@
 #include "Player/C_PlayerState.h"
 #include "UI/C_UIComponent.h"
 #include "Glyph/C_GlyphInventoryComponent.h"
+#include "AbilitySystemComponent.h"
 
 AC_PlayerCharacter::AC_PlayerCharacter()
 {
@@ -20,5 +21,6 @@ UAbilitySystemComponent* AC_PlayerCharacter::GetAbilitySystemComponent() const
 void AC_PlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	GetAbilitySystemComponent()->InitAbilityActorInfo(GetPlayerState(), this);
 	GiveStartupAbilities();
 }
