@@ -7,6 +7,8 @@
 #include "C_GlyphBase.generated.h"
 
 class UGameplayAbility;
+class UAbilityTask_WaitGameplayEvent;
+class UAbilityTask_PlayMontageAndWait;
 
 UENUM(BlueprintType)
 enum class EGlyphType : uint8
@@ -70,12 +72,22 @@ class GLYPH_API UC_GlyphBase : public UObject
 	GENERATED_BODY()
 	
 public:
+	//Glyph Information
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,Category = "C|Glyph")
 	FName GlyphName = FName("Base");
 
+	UPROPERTY(BlueprintReadOnly, Category = "C|Glyph")
 	EGlyphType GlyphType = EGlyphType::None;
 
-	UPROPERTY(BlueprintAssignable, Category = "C|Glyph|Event")
+	//Tool Function
+	UFUNCTION(BlueprintCallable, Category = "C|Ability|Tasks")
+	UAbilityTask_WaitGameplayEvent* CreateWaitGameplayEventTask(UGameplayAbility* OwningAbility, FGameplayTag EventTag, AActor* OptionalExternalTarget = nullptr, bool OnlyTriggerOnce = false, bool OnlyMatchExact = true);
+
+	UFUNCTION(BlueprintCallable, Category = "C|Ability|Tasks")
+	UAbilityTask_PlayMontageAndWait* CreatePlayMontageAndWaitTask(UGameplayAbility* OwningAbility,FName TaskInstanceName, UAnimMontage* MontageToPlay, float Rate = 1.f, FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float AnimRootMotionTranslationScale = 1.f, float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false);
+
+
+	//Glyph Ability
 	FBaseEventReceived OnBaseEvent;
 
 	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Base")
