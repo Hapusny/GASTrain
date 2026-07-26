@@ -76,27 +76,39 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,Category = "C|Glyph")
 	FName GlyphName = FName("Base");
 
-	UPROPERTY(BlueprintReadOnly, Category = "C|Glyph")
 	EGlyphType GlyphType = EGlyphType::None;
+
+	UPROPERTY(BlueprintReadOnly, Category = "C|Ability")
+	TWeakObjectPtr<UGameplayAbility>OwningAbility;
 
 	//Tool Function
 	UFUNCTION(BlueprintCallable, Category = "C|Ability|Tasks")
-	UAbilityTask_WaitGameplayEvent* CreateWaitGameplayEventTask(UGameplayAbility* OwningAbility, FGameplayTag EventTag, AActor* OptionalExternalTarget = nullptr, bool OnlyTriggerOnce = false, bool OnlyMatchExact = true);
+	UAbilityTask_WaitGameplayEvent* CreateWaitGameplayEventTask(FGameplayTag EventTag, AActor* OptionalExternalTarget = nullptr, bool OnlyTriggerOnce = false, bool OnlyMatchExact = true);
 
 	UFUNCTION(BlueprintCallable, Category = "C|Ability|Tasks")
-	UAbilityTask_PlayMontageAndWait* CreatePlayMontageAndWaitTask(UGameplayAbility* OwningAbility,FName TaskInstanceName, UAnimMontage* MontageToPlay, float Rate = 1.f, FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float AnimRootMotionTranslationScale = 1.f, float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false);
+	UAbilityTask_PlayMontageAndWait* CreatePlayMontageAndWaitTask(FName TaskInstanceName, UAnimMontage* MontageToPlay, float Rate = 1.f, FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float AnimRootMotionTranslationScale = 1.f, float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false);
 
+	UFUNCTION(BlueprintCallable, Category = "C|Ability|Spawn")
+	AActor* SpawnActor(TSubclassOf<AActor> ActorClass, FVector Location,FRotator Rotator);
 
 	//Glyph Ability
+	void ActivateGlyph(UGameplayAbility* Ability);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
+	void AttackBase();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
+	void SkillBase();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
+	void MoveBase();
+
 	FBaseEventReceived OnBaseEvent;
 
-	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Base")
+	UFUNCTION(BlueprintCallable, Category = "C|Glyph|Base")
 	void BaseEvent(EBaseEventType EventType, FBaseEventContext Context);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Variant")
 	void BaseEventReceived(EBaseEventType EventType, FBaseEventContext Context);
-
-	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph")
-	void ActivateGlyph(UGameplayAbility* Ability);
 
 };
