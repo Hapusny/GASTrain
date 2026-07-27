@@ -10,6 +10,7 @@
 
 class UC_GlyphInventoryComponent;
 class UGameplayAbility;
+class UAttributeSet;
 
 UCLASS()
 class GLYPH_API AC_BaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -19,6 +20,8 @@ class GLYPH_API AC_BaseCharacter : public ACharacter, public IAbilitySystemInter
 public:
 	AC_BaseCharacter();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent()const override;
+
+	virtual UAttributeSet* GetAttributeSet()const;
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UC_GlyphInventoryComponent>GlyphInventoryComponent;

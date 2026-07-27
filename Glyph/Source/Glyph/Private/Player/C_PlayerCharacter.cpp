@@ -18,6 +18,12 @@ UAbilitySystemComponent* AC_PlayerCharacter::GetAbilitySystemComponent() const
 	return GetPlayerState<AC_PlayerState>()->GetAbilitySystemComponent();
 }
 
+UAttributeSet* AC_PlayerCharacter::GetAttributeSet() const
+{
+	if (!IsValid(GetPlayerState<AC_PlayerState>()))return nullptr;
+	return GetPlayerState<AC_PlayerState>()->GetAttributeSet();
+}
+
 void AC_PlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();

@@ -7,6 +7,7 @@
 #include "C_PlayerState.generated.h"
 
 class UAbilitySystemComponent;
+class UAttributeSet;
 
 /**
  * 
@@ -19,10 +20,15 @@ class GLYPH_API AC_PlayerState : public APlayerState
 public:
 	AC_PlayerState();
 
-	UAbilitySystemComponent* GetAbilitySystemComponent();
+	UAbilitySystemComponent* GetAbilitySystemComponent()const;
+
+	UAttributeSet* GetAttributeSet()const;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "C|Ability")
 	TObjectPtr<UAbilitySystemComponent>AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UAttributeSet>AttributeSet;
 	
 };

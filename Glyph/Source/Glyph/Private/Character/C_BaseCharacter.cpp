@@ -17,6 +17,11 @@ UAbilitySystemComponent* AC_BaseCharacter::GetAbilitySystemComponent() const
 	return nullptr;
 }
 
+UAttributeSet* AC_BaseCharacter::GetAttributeSet() const
+{
+	return nullptr;
+}
+
 void AC_BaseCharacter::GiveStartupAbilities()
 {
 	if (!IsValid(GetAbilitySystemComponent()))return;
