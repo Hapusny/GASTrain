@@ -5,6 +5,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Glyph/C_GlyphSpawnActor.h"
+#include "Character/C_BaseCharacter.h"
 
 void UC_GlyphBase::ActivateGlyph(UGameplayAbility* Ability)
 {
@@ -46,7 +48,7 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
     return Task;
 }
 
-AActor* UC_GlyphBase::SpawnActor(TSubclassOf<AActor> ActorClass, FVector Location, FRotator Rotator)
+AActor* UC_GlyphBase::SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, FVector Location, FRotator Rotator)
 {
     UWorld* World = GetWorld();
     if (!IsValid(World))return nullptr;
@@ -58,6 +60,53 @@ AActor* UC_GlyphBase::SpawnActor(TSubclassOf<AActor> ActorClass, FVector Locatio
     //在指定位置和旋转生成
     FVector SpawnLocation = Location;
     FRotator SpawnRotation = Rotator;
-    AActor* SpawnedActor = World->SpawnActor<AActor>(ActorClass, SpawnLocation, SpawnRotation, SpawnParams);
+    AActor* SpawnedActor = World->SpawnActor<AC_GlyphSpawnActor>(ActorClass, SpawnLocation, SpawnRotation, SpawnParams);
     return SpawnedActor;
 }
+
+TArray<AActor*> UC_GlyphBase::SphereCollisionOverlapCheck(AActor* AvatarActor, float HitBoxRadius, float HitBoxForwardOffset, float HitBoxElevationOffset, bool bDrawDebugs)
+{
+    if (!IsValid(AvatarActor))return TArray<AActor*>();
+
+    FCollisionQueryParams QueryParams;
+    QueryParams.AddIgnoredActor(AvatarActor);
+
+    FCollisionResponseParams ResponseParams;
+    ResponseParams.CollisionResponse.SetAllChannels(ECR_Ignore);
+    ResponseParams.CollisionResponse.SetResponse(ECC_Pawn, ECR_Block);
+
+    TArray<FOverlapResult> OverlapResults;
+    FCollisionShape Sphere = FCollisionShape::MakeSphere(HitBoxRadius);
+
+    const FVector Foward = AvatarActor->GetActorForwardVector() * HitBoxForwardOffset;
+    const FVector HitBoxLocation = AvatarActor->GetActorLocation() + Foward + FVector(0.f, 0.f, HitBoxElevationOffset);
+
+    UWorld* World = AvatarActor->GetWorld();
+    if (!IsValid(World))return TArray<AActor*>();
+    World->OverlapMultiByChannel(OverlapResults, HitBoxLocation, FQuat::Identity, ECC_Pawn, Sphere, QueryParams, ResponseParams);
+
+    TArray<AActor*> ActorsHit;
+
+    for (const FOverlapResult& Result : OverlapResults) {
+        AC_BaseCharacter* BaseCharacter = Cast<AC_BaseCharacter>(Result.GetActor());
+        if (!IsValid(Result.GetActor()))continue;
+        ActorsHit.AddUnique(BaseCharacter);
+    }
+
+    if (bDrawDebugs)
+    {
+        DrawDebugSphere(World, HitBoxLocation, HitBoxRadius, 16, FColor::Red, false, 3.f);
+
+        for (const FOverlapResult& Result : OverlapResults) {
+            if (IsValid(Result.GetActor())) {
+                FVector DebugLocation = Result.GetActor()->GetActorLocation();
+                DebugLocation.Z += 100.f;
+                DrawDebugSphere(World, DebugLocation, 30.f, 10, FColor::Green, false, 3.f);
+            }
+        }
+    }
+    return ActorsHit;
+}
+
+
+

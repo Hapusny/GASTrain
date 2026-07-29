@@ -9,6 +9,7 @@
 class UGameplayAbility;
 class UAbilityTask_WaitGameplayEvent;
 class UAbilityTask_PlayMontageAndWait;
+class AC_GlyphSpawnActor;
 
 UENUM(BlueprintType)
 enum class EGlyphType : uint8
@@ -50,7 +51,7 @@ struct FBaseEventContext
 	float Damage;
 
 	UPROPERTY(BlueprintReadWrite, Category = "EventContext")
-	FHitResult HitResult;
+	TArray<FHitResult>HitResults;
 
 	FBaseEventContext()
 		: Initiator(nullptr)
@@ -72,6 +73,7 @@ class GLYPH_API UC_GlyphBase : public UObject
 	GENERATED_BODY()
 	
 public:
+
 	//Glyph Information
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,Category = "C|Glyph")
 	FName GlyphName = FName("Base");
@@ -82,14 +84,17 @@ public:
 	TWeakObjectPtr<UGameplayAbility>OwningAbility;
 
 	//Tool Function
-	UFUNCTION(BlueprintCallable, Category = "C|Ability|Tasks")
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Tasks")
 	UAbilityTask_WaitGameplayEvent* CreateWaitGameplayEventTask(FGameplayTag EventTag, AActor* OptionalExternalTarget = nullptr, bool OnlyTriggerOnce = false, bool OnlyMatchExact = true);
 
-	UFUNCTION(BlueprintCallable, Category = "C|Ability|Tasks")
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Tasks")
 	UAbilityTask_PlayMontageAndWait* CreatePlayMontageAndWaitTask(FName TaskInstanceName, UAnimMontage* MontageToPlay, float Rate = 1.f, FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float AnimRootMotionTranslationScale = 1.f, float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false);
 
-	UFUNCTION(BlueprintCallable, Category = "C|Ability|Spawn")
-	AActor* SpawnActor(TSubclassOf<AActor> ActorClass, FVector Location,FRotator Rotator);
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Spawn")
+	AActor* SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, FVector Location,FRotator Rotator);
+
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Collision")
+	TArray<AActor*> SphereCollisionOverlapCheck(AActor* AvatarActor, float HitBoxRadius, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
 
 	//Glyph Ability
 	void ActivateGlyph(UGameplayAbility* Ability);
