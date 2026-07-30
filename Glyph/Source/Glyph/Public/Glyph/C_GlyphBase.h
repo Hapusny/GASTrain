@@ -130,4 +130,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Variant")
 	void BaseEventReceived(EBaseEventType EventType, FBaseEventContext Context);
 
+private:
+	UFUNCTION()
+	void MontageEnd();
+
 };

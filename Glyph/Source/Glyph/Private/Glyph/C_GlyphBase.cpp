@@ -7,6 +7,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Glyph/C_GlyphSpawnActor.h"
 #include "Character/C_BaseCharacter.h"
+#include "AbilitySystemComponent.h"
 
 void UC_GlyphBase::ActivateGlyph(UGameplayAbility* Ability)
 {
@@ -21,6 +22,17 @@ void UC_GlyphBase::ActivateGlyph(UGameplayAbility* Ability)
 void UC_GlyphBase::BaseEvent(EBaseEventType EventType, FBaseEventContext Context)
 {
     OnBaseEvent.Broadcast(EventType, Context);
+}
+
+void UC_GlyphBase::MontageEnd()
+{
+    if (!OwningAbility.IsValid())return;
+    UAbilitySystemComponent* ASC = OwningAbility.Get()->GetAbilitySystemComponentFromActorInfo();
+    FGameplayAbilitySpecHandle Handle = OwningAbility->GetCurrentAbilitySpecHandle();
+    if (!IsValid(ASC))return;
+    if (!Handle.IsValid())return;
+    if (!OwningAbility->IsActive()) return;
+    ASC->CancelAbilityHandle(Handle);
 }
 
 void UC_GlyphBase::BaseEventReceived_Implementation(EBaseEventType EventType, FBaseEventContext Context)
@@ -42,9 +54,17 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
 {
     if (!OwningAbility.IsValid())return nullptr;
 
-    // 直接调用工厂函数生成，激活并返回
+    // 直接调用工厂函数生成，激活,绑定并返回
     UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(OwningAbility.Get(), TaskInstanceName, MontageToPlay, Rate, StartSection, bStopWhenAbilityEnds, AnimRootMotionTranslationScale, StartTimeSeconds, bAllowInterruptAfterBlendOut);
     Task->Activate();
+    Task->OnBlendOut.Clear();
+    Task->OnCancelled.Clear();
+    Task->OnCompleted.Clear();
+    Task->OnInterrupted.Clear();
+    Task->OnBlendOut.AddDynamic(this, &ThisClass::MontageEnd);
+    Task->OnCancelled.AddDynamic(this, &ThisClass::MontageEnd);
+    Task->OnCompleted.AddDynamic(this, &ThisClass::MontageEnd);
+    Task->OnInterrupted.AddDynamic(this, &ThisClass::MontageEnd);
     return Task;
 }
 
