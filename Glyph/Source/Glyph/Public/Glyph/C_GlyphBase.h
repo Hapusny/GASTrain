@@ -4,12 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "C_GlyphSpawnActor.h"
 #include "C_GlyphBase.generated.h"
 
 class UGameplayAbility;
 class UAbilityTask_WaitGameplayEvent;
 class UAbilityTask_PlayMontageAndWait;
 class AC_GlyphSpawnActor;
+
+UENUM(BlueprintType)
+enum class EGlyphAttribute : uint8
+{
+	None,
+	Fire,
+	Water,
+	Wind,
+	Soil
+};
 
 UENUM(BlueprintType)
 enum class EGlyphType : uint8
@@ -20,7 +31,7 @@ enum class EGlyphType : uint8
 	SkillBase,
 	SkillVariant,
 	MoveBase,
-	MoveVariant,
+	MoveVariant
 };
 
 UENUM(BlueprintType)
@@ -67,7 +78,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBaseEventReceived, EBaseEventType,
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, BlueprintType)
 class GLYPH_API UC_GlyphBase : public UObject
 {
 	GENERATED_BODY()
@@ -77,6 +88,9 @@ public:
 	//Glyph Information
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly,Category = "C|Glyph")
 	FName GlyphName = FName("Base");
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph")
+	EGlyphAttribute GlyphAttribute = EGlyphAttribute::None;
 
 	EGlyphType GlyphType = EGlyphType::None;
 
@@ -91,7 +105,7 @@ public:
 	UAbilityTask_PlayMontageAndWait* CreatePlayMontageAndWaitTask(FName TaskInstanceName, UAnimMontage* MontageToPlay, float Rate = 1.f, FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float AnimRootMotionTranslationScale = 1.f, float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false);
 
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Spawn")
-	AActor* SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, FVector Location,FRotator Rotator);
+	TArray<AActor*> SpawnActor(UC_GlyphBase* Glyph, TSubclassOf<AC_GlyphSpawnActor> ActorClass, FTransform Transform,int Number = 1,ESpawnActorType SpawnActorType = ESpawnActorType::None,float OrbitDistance = 100.f,float OrbitAngleSpeed = 1.f);
 
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Collision")
 	TArray<AActor*> SphereCollisionOverlapCheck(AActor* AvatarActor, float HitBoxRadius, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);

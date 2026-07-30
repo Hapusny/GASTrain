@@ -95,6 +95,22 @@ bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGamepla
 	return true;
 }
 
+UC_GlyphBase* UC_GlyphInventoryComponent::GetBaseSlotGlyph(UC_GlyphBase* Variant)
+{
+	switch (Variant->GlyphType)
+	{
+	case EGlyphType::AttackVariant:
+		if (AttackSlot[0].IsValid())return AttackSlot[0].Get();
+	case EGlyphType::SkillVariant:
+		if (SkillSlot[0].IsValid())return SkillSlot[0].Get();
+	case EGlyphType::MoveVariant:
+		if (MoveSlot[0].IsValid())return MoveSlot[0].Get();
+	default:break;
+	}
+	return nullptr;
+}
+
+
 UC_GlyphBase* UC_GlyphInventoryComponent::CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass)
 {
 	if (!GlyphClass)return nullptr;

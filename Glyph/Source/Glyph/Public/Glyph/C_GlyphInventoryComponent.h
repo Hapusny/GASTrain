@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
 	bool ActivateSlotGlyph(EGlyphType SlotType,UGameplayAbility* Ability);
 
+	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
+	UC_GlyphBase* GetBaseSlotGlyph(UC_GlyphBase* Variant);
+
 protected:
 	UC_GlyphBase* CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass);
 

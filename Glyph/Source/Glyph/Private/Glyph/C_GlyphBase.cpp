@@ -48,20 +48,52 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
     return Task;
 }
 
-AActor* UC_GlyphBase::SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, FVector Location, FRotator Rotator)
+TArray<AActor*> UC_GlyphBase::SpawnActor(UC_GlyphBase* Glyph,TSubclassOf<AC_GlyphSpawnActor> ActorClass, FTransform Transform, int Number, ESpawnActorType SpawnActorType, float OrbitDistance, float OrbitAngleSpeed)
 {
     UWorld* World = GetWorld();
-    if (!IsValid(World))return nullptr;
+    TArray<AActor*> Actors;
+    if (!IsValid(World))return Actors;
 
-    FActorSpawnParameters SpawnParams;
-    if (!OwningAbility.IsValid())return nullptr;
-    SpawnParams.Owner = OwningAbility.Get()->GetAvatarActorFromActorInfo();
+    if (!IsValid(Glyph))return Actors;
+    if (!IsValid(ActorClass))return Actors;
 
-    //在指定位置和旋转生成
-    FVector SpawnLocation = Location;
-    FRotator SpawnRotation = Rotator;
-    AActor* SpawnedActor = World->SpawnActor<AC_GlyphSpawnActor>(ActorClass, SpawnLocation, SpawnRotation, SpawnParams);
-    return SpawnedActor;
+    if (!OwningAbility.IsValid())return Actors;
+    AC_BaseCharacter* Owner = Cast<AC_BaseCharacter>(OwningAbility.Get()->GetAvatarActorFromActorInfo());
+    if (!IsValid(Owner))return Actors;
+
+    //生成
+    AC_GlyphSpawnActor* SpawnedActor;
+
+    switch (SpawnActorType)
+    {
+    case ESpawnActorType::None:
+        SpawnedActor = World->SpawnActorDeferred<AC_GlyphSpawnActor>(ActorClass,Transform,Owner,Owner,ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+        if (SpawnedActor) {
+            SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(Glyph);
+            SpawnedActor->SpawnActorType = SpawnActorType;
+
+            SpawnedActor->FinishSpawning(Transform);
+        }
+        Actors.Add(SpawnedActor);
+        break;
+
+    case ESpawnActorType::Orbit:
+        for (int i = 0; i < Number; i++) {
+            SpawnedActor = World->SpawnActorDeferred<AC_GlyphSpawnActor>(ActorClass, Transform, Owner, Owner, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+            if (SpawnedActor) {
+                SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(Glyph);
+                SpawnedActor->SpawnActorType = SpawnActorType;
+                SpawnedActor->SetOrbit(OrbitDistance, OrbitAngleSpeed, 360.f / Number * i);
+                
+                SpawnedActor->FinishSpawning(Transform);
+            }
+            Actors.Add(SpawnedActor);
+        }
+        break;
+    default:
+        break;
+    }
+    return Actors;
 }
 
 TArray<AActor*> UC_GlyphBase::SphereCollisionOverlapCheck(AActor* AvatarActor, float HitBoxRadius, float HitBoxForwardOffset, float HitBoxElevationOffset, bool bDrawDebugs)
