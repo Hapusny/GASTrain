@@ -88,28 +88,42 @@ UC_GlyphBase* UC_GlyphInventoryComponent::NameToGlyph(FName Name)
 
 bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGameplayAbility* Ability)
 {
-	if (SlotType != EGlyphType::AttackBase && SlotType != EGlyphType::SkillBase && SlotType != EGlyphType::MoveBase) return false;
-	UC_GlyphBase* TargetGlyph = SlotContent(0, SlotType);
-	if (!IsValid(TargetGlyph))return false;
-	TargetGlyph->ActivateGlyph(Ability);
+	//获取对应槽位刻印
+	UC_GlyphBase* BaseGlyph = nullptr, *VariantGlyph = nullptr;
+	FBaseGlyphContext Context;
+	switch (SlotType)
+	{
+	case EGlyphType::AttackBase:
+		if (AttackSlot[0].IsValid())BaseGlyph = AttackSlot[0].Get();
+		if (AttackSlot[1].IsValid())VariantGlyph = AttackSlot[1].Get();
+		if (!IsValid(BaseGlyph))return false;
+		Context = BaseGlyph->AttackConfiguration;
+		break;
+	case EGlyphType::SkillBase:
+		if (SkillSlot[0].IsValid())BaseGlyph = SkillSlot[0].Get();
+		if (SkillSlot[1].IsValid())VariantGlyph = SkillSlot[1].Get();
+		if (!IsValid(BaseGlyph))return false;
+		Context = BaseGlyph->SkillConfiguration;
+		break;
+	case EGlyphType::MoveBase:
+		if (MoveSlot[0].IsValid())BaseGlyph = MoveSlot[0].Get();
+		if (MoveSlot[1].IsValid())VariantGlyph = MoveSlot[1].Get();
+		if (!IsValid(BaseGlyph))return false;
+		Context = BaseGlyph->MoveConfiguration;
+		break;
+	default:
+		return false;
+	}
+
+	//数据预处理
+	if (IsValid(VariantGlyph)) {
+		VariantGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
+		VariantGlyph->PreProcessContext(SlotType, Context);
+	}
+
+	BaseGlyph->ActivateGlyph(Ability, Context);
 	return true;
 }
-
-UC_GlyphBase* UC_GlyphInventoryComponent::GetBaseSlotGlyph(UC_GlyphBase* Variant)
-{
-	switch (Variant->GlyphType)
-	{
-	case EGlyphType::AttackVariant:
-		if (AttackSlot[0].IsValid())return AttackSlot[0].Get();
-	case EGlyphType::SkillVariant:
-		if (SkillSlot[0].IsValid())return SkillSlot[0].Get();
-	case EGlyphType::MoveVariant:
-		if (MoveSlot[0].IsValid())return MoveSlot[0].Get();
-	default:break;
-	}
-	return nullptr;
-}
-
 
 UC_GlyphBase* UC_GlyphInventoryComponent::CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass)
 {

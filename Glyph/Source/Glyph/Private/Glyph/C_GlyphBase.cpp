@@ -9,14 +9,14 @@
 #include "Character/C_BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 
-void UC_GlyphBase::ActivateGlyph(UGameplayAbility* Ability)
+void UC_GlyphBase::ActivateGlyph(UGameplayAbility* Ability,FBaseGlyphContext Context)
 {
     if (!IsValid(Ability)) return;
     OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
 
-    if (GlyphType == EGlyphType::AttackBase)AttackBase();
-    if (GlyphType == EGlyphType::SkillBase)SkillBase();
-    if (GlyphType == EGlyphType::MoveBase)MoveBase();
+    if (GlyphType == EGlyphType::AttackBase)AttackBase(Context);
+    if (GlyphType == EGlyphType::SkillBase)SkillBase(Context);
+    if (GlyphType == EGlyphType::MoveBase)MoveBase(Context);
 }
 
 void UC_GlyphBase::BaseEvent(EBaseEventType EventType, FBaseEventContext Context)
@@ -33,11 +33,6 @@ void UC_GlyphBase::MontageEnd()
     if (!Handle.IsValid())return;
     if (!OwningAbility->IsActive()) return;
     ASC->CancelAbilityHandle(Handle);
-}
-
-void UC_GlyphBase::BaseEventReceived_Implementation(EBaseEventType EventType, FBaseEventContext Context)
-{
-    
 }
 
 UAbilityTask_WaitGameplayEvent* UC_GlyphBase::CreateWaitGameplayEventTask(FGameplayTag EventTag, AActor* OptionalExternalTarget, bool OnlyTriggerOnce, bool OnlyMatchExact)
@@ -68,16 +63,15 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
     return Task;
 }
 
-TArray<AActor*> UC_GlyphBase::SpawnActor(UC_GlyphBase* Glyph,TSubclassOf<AC_GlyphSpawnActor> ActorClass, FTransform Transform, int Number, ESpawnActorType SpawnActorType, float OrbitDistance, float OrbitAngleSpeed)
+TArray<AActor*> UC_GlyphBase::SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, FTransform Transform, int Number, ESpawnActorType SpawnActorType, float OrbitDistance, float OrbitAngleSpeed)
 {
     UWorld* World = GetWorld();
     TArray<AActor*> Actors;
     if (!IsValid(World))return Actors;
 
-    if (!IsValid(Glyph))return Actors;
     if (!IsValid(ActorClass))return Actors;
 
-    if (!OwningAbility.IsValid())return Actors;
+    if (!OwningAbility.IsValid()) return Actors;
     AC_BaseCharacter* Owner = Cast<AC_BaseCharacter>(OwningAbility.Get()->GetAvatarActorFromActorInfo());
     if (!IsValid(Owner))return Actors;
 
@@ -89,7 +83,7 @@ TArray<AActor*> UC_GlyphBase::SpawnActor(UC_GlyphBase* Glyph,TSubclassOf<AC_Glyp
     case ESpawnActorType::None:
         SpawnedActor = World->SpawnActorDeferred<AC_GlyphSpawnActor>(ActorClass,Transform,Owner,Owner,ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
         if (SpawnedActor) {
-            SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(Glyph);
+            SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(this);
             SpawnedActor->SpawnActorType = SpawnActorType;
 
             SpawnedActor->FinishSpawning(Transform);
@@ -101,7 +95,7 @@ TArray<AActor*> UC_GlyphBase::SpawnActor(UC_GlyphBase* Glyph,TSubclassOf<AC_Glyp
         for (int i = 0; i < Number; i++) {
             SpawnedActor = World->SpawnActorDeferred<AC_GlyphSpawnActor>(ActorClass, Transform, Owner, Owner, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
             if (SpawnedActor) {
-                SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(Glyph);
+                SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(this);
                 SpawnedActor->SpawnActorType = SpawnActorType;
                 SpawnedActor->SetOrbit(OrbitDistance, OrbitAngleSpeed, 360.f / Number * i);
                 

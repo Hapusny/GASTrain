@@ -45,32 +45,44 @@ enum class EBaseEventType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FBaseGlyphContext
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	float Damage = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 ProjectileCount = 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float SpeedMultiplier = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float RangeMultiplier = 1.f;
+
+};
+
+USTRUCT(BlueprintType)
 struct FBaseEventContext
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite, Category = "EventContext")
-	AActor* Initiator;
+	UC_GlyphBase* BaseGlyph = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, Category = "EventContext")
-	FVector EventLocation;
+	FVector EventLocation = FVector::ZeroVector;
 
 	UPROPERTY(BlueprintReadWrite, Category = "EventContext")
-	FVector EventToward;
+	FVector EventToward = FVector::ZeroVector;
 
 	UPROPERTY(BlueprintReadWrite, Category = "EventContext")
-	float Damage;
+	float Damage = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, Category = "EventContext")
 	TArray<FHitResult>HitResults;
 
-	FBaseEventContext()
-		: Initiator(nullptr)
-		, EventLocation(FVector::ZeroVector)
-		, EventToward(FVector::ZeroVector)
-		, Damage(0.0f)
-	{
-	}
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FBaseEventReceived, EBaseEventType, EventType, FBaseEventContext, Context);
@@ -97,6 +109,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "C|Ability")
 	TWeakObjectPtr<UGameplayAbility>OwningAbility;
 
+	//Glyph Configuration
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph|Attack")
+	FBaseGlyphContext AttackConfiguration;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph|Skill")
+	FBaseGlyphContext SkillConfiguration;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph|Move")
+	FBaseGlyphContext MoveConfiguration;
+
 	//Tool Function
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Tasks")
 	UAbilityTask_WaitGameplayEvent* CreateWaitGameplayEventTask(FGameplayTag EventTag, AActor* OptionalExternalTarget = nullptr, bool OnlyTriggerOnce = false, bool OnlyMatchExact = true);
@@ -105,29 +127,32 @@ public:
 	UAbilityTask_PlayMontageAndWait* CreatePlayMontageAndWaitTask(FName TaskInstanceName, UAnimMontage* MontageToPlay, float Rate = 1.f, FName StartSection = NAME_None, bool bStopWhenAbilityEnds = true, float AnimRootMotionTranslationScale = 1.f, float StartTimeSeconds = 0.f, bool bAllowInterruptAfterBlendOut = false);
 
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Spawn")
-	TArray<AActor*> SpawnActor(UC_GlyphBase* Glyph, TSubclassOf<AC_GlyphSpawnActor> ActorClass, FTransform Transform,int Number = 1,ESpawnActorType SpawnActorType = ESpawnActorType::None,float OrbitDistance = 100.f,float OrbitAngleSpeed = 1.f);
+	TArray<AActor*> SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, FTransform Transform,int Number = 1,ESpawnActorType SpawnActorType = ESpawnActorType::None,float OrbitDistance = 100.f,float OrbitAngleSpeed = 1.f);
 
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Collision")
 	TArray<AActor*> SphereCollisionOverlapCheck(AActor* AvatarActor, float HitBoxRadius, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
 
 	//Glyph Ability
-	void ActivateGlyph(UGameplayAbility* Ability);
+	void ActivateGlyph(UGameplayAbility* Ability, FBaseGlyphContext Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
-	void AttackBase();
+	void AttackBase(FBaseGlyphContext Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
-	void SkillBase();
+	void SkillBase(FBaseGlyphContext Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
-	void MoveBase();
+	void MoveBase(FBaseGlyphContext Context);
 
 	FBaseEventReceived OnBaseEvent;
 
 	UFUNCTION(BlueprintCallable, Category = "C|Glyph|Base")
 	void BaseEvent(EBaseEventType EventType, FBaseEventContext Context);
 
-	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Variant")
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
+	void PreProcessContext(EGlyphType BaseGlyphType,FBaseGlyphContext& Context);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
 	void BaseEventReceived(EBaseEventType EventType, FBaseEventContext Context);
 
 private:
