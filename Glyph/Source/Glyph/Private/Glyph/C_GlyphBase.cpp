@@ -27,11 +27,11 @@ void UC_GlyphBase::BaseEvent(EBaseEventType EventType, FBaseEventContext Context
 void UC_GlyphBase::MontageEnd()
 {
     if (!OwningAbility.IsValid())return;
+    if (!OwningAbility->IsActive()) return;
     UAbilitySystemComponent* ASC = OwningAbility.Get()->GetAbilitySystemComponentFromActorInfo();
     FGameplayAbilitySpecHandle Handle = OwningAbility->GetCurrentAbilitySpecHandle();
     if (!IsValid(ASC))return;
     if (!Handle.IsValid())return;
-    if (!OwningAbility->IsActive()) return;
     ASC->CancelAbilityHandle(Handle);
 }
 
@@ -52,14 +52,10 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
     // 直接调用工厂函数生成，激活,绑定并返回
     UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(OwningAbility.Get(), TaskInstanceName, MontageToPlay, Rate, StartSection, bStopWhenAbilityEnds, AnimRootMotionTranslationScale, StartTimeSeconds, bAllowInterruptAfterBlendOut);
     Task->Activate();
-    Task->OnBlendOut.Clear();
-    Task->OnCancelled.Clear();
-    Task->OnCompleted.Clear();
-    Task->OnInterrupted.Clear();
-    Task->OnBlendOut.AddDynamic(this, &ThisClass::MontageEnd);
-    Task->OnCancelled.AddDynamic(this, &ThisClass::MontageEnd);
-    Task->OnCompleted.AddDynamic(this, &ThisClass::MontageEnd);
-    Task->OnInterrupted.AddDynamic(this, &ThisClass::MontageEnd);
+    Task->OnBlendOut.AddUniqueDynamic(this, &ThisClass::MontageEnd);
+    Task->OnCancelled.AddUniqueDynamic(this, &ThisClass::MontageEnd);
+    Task->OnCompleted.AddUniqueDynamic(this, &ThisClass::MontageEnd);
+    Task->OnInterrupted.AddUniqueDynamic(this, &ThisClass::MontageEnd);
     return Task;
 }
 
@@ -153,6 +149,7 @@ TArray<AActor*> UC_GlyphBase::SphereCollisionOverlapCheck(AActor* AvatarActor, f
     }
     return ActorsHit;
 }
+
 
 
 

@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Glyph/C_GlyphBase.h"
 #include "C_GlyphInventoryComponent.generated.h"
 
-class UC_GlyphBase;
 class UGameplayAbility;
-enum class EGlyphType : uint8;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FGlyphInventoryChange,bool,bIsAdd,FName,GlyphName);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FGlyphTypeChange, EGlyphType,NewGlyphType , FName, GlyphName, EGlyphType, OldGlyphType);
@@ -45,8 +44,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
 	bool ActivateSlotGlyph(EGlyphType SlotType,UGameplayAbility* Ability);
 
+	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
+	void EndRunningCharge();
+
 protected:
 	UC_GlyphBase* CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass);
+
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	UPROPERTY()
@@ -64,5 +68,21 @@ private:
 	void BindGlyph();
 
 	void UnbindGlyph();
+
+
+	//ChargeInput
+	TWeakObjectPtr<UGameplayAbility> RunningAbility;
+
+	TWeakObjectPtr<UC_GlyphBase> RunningGlyph;
+
+	FBaseGlyphContext RunningContext;
+
+	int32  ChargeIndex = -1;
+
+	float ChargeStartTime = 0.f;
+
+	float IndexChangeTime = 0.f;
+
+	void SettleCharge(FBaseGlyphContext& Context, float ChargeTime);
 
 };

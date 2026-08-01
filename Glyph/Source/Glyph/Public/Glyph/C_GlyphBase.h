@@ -61,6 +61,9 @@ struct FBaseGlyphContext
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float RangeMultiplier = 1.f;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
+	TArray<float>ChargeTime;
+
 };
 
 USTRUCT(BlueprintType)
@@ -133,6 +136,12 @@ public:
 	TArray<AActor*> SphereCollisionOverlapCheck(AActor* AvatarActor, float HitBoxRadius, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
 
 	//Glyph Ability
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
+	FBaseGlyphContext PreProcessContext(EGlyphType BaseGlyphType, FBaseGlyphContext Context);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph")
+	void PreActivate();
+
 	void ActivateGlyph(UGameplayAbility* Ability, FBaseGlyphContext Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
@@ -148,9 +157,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "C|Glyph|Base")
 	void BaseEvent(EBaseEventType EventType, FBaseEventContext Context);
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
-	void PreProcessContext(EGlyphType BaseGlyphType,FBaseGlyphContext& Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
 	void BaseEventReceived(EBaseEventType EventType, FBaseEventContext Context);

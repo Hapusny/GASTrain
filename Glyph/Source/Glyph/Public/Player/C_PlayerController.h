@@ -57,6 +57,8 @@ private:
 
 	void Menu();
 
+	void EndCharge();
+
 	void ActivateAbility(const FGameplayTag& AbilityTag)const;
 
 	bool bLookingMenu = false;

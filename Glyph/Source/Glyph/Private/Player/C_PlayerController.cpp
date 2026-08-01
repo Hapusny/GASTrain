@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Glyph/C_GlyphInventoryComponent.h"
 #include "Ability/C_Tags.h"
 #include "Player/C_PlayerCharacter.h"
 #include "UI/C_UIComponent.h"
@@ -28,6 +29,9 @@ void AC_PlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ThisClass::Attack);
 	EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Triggered, this, &ThisClass::Skill);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &ThisClass::EndCharge);
+	EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Completed, this, &ThisClass::EndCharge);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::EndCharge);
 	EnhancedInputComponent->BindAction(MenuAction, ETriggerEvent::Started, this, &ThisClass::Menu);
 }
 
@@ -92,6 +96,15 @@ void AC_PlayerController::Menu()
 		bLookingMenu = true;
 	}
 	
+}
+
+void AC_PlayerController::EndCharge()
+{
+	AC_PlayerCharacter* PlayerCharacter = Cast<AC_PlayerCharacter>(GetPawn());
+	if (!IsValid(PlayerCharacter))return;
+	UC_GlyphInventoryComponent* GIC = PlayerCharacter->GlyphInventoryComponent;
+	if (!IsValid(GIC))return;
+	GIC->EndRunningCharge();
 }
 
 void AC_PlayerController::ActivateAbility(const FGameplayTag& AbilityTag) const
