@@ -64,6 +64,9 @@ struct FBaseGlyphContext
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	TArray<float>ChargeTime;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<UAnimMontage*> ChargeMontage;
+
 };
 
 USTRUCT(BlueprintType)
@@ -135,6 +138,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Collision")
 	TArray<AActor*> SphereCollisionOverlapCheck(AActor* AvatarActor, float HitBoxRadius, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
 
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Collision")
+	TArray<AActor*> BoxCollisionOverlapCheck(AActor* AvatarActor, FVector BoxSize, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
+
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Collision")
+	TArray<AActor*> LineCollisionHitCheck(AActor* AvatarActor, float Length, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
+
 	//Glyph Ability
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
 	FBaseGlyphContext PreProcessContext(EGlyphType BaseGlyphType, FBaseGlyphContext Context);
@@ -142,7 +151,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph")
 	void PreActivate();
 
-	void ActivateGlyph(UGameplayAbility* Ability, FBaseGlyphContext Context);
+	void ActivateGlyph(FBaseGlyphContext Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
 	void AttackBase(FBaseGlyphContext Context);

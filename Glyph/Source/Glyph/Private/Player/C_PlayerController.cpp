@@ -95,7 +95,6 @@ void AC_PlayerController::Menu()
 		SetInputMode(InputMode);
 		bLookingMenu = true;
 	}
-	
 }
 
 void AC_PlayerController::EndCharge()

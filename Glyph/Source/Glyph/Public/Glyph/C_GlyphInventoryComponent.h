@@ -69,19 +69,22 @@ private:
 
 	void UnbindGlyph();
 
-
 	//ChargeInput
-	TWeakObjectPtr<UGameplayAbility> RunningAbility;
-
 	TWeakObjectPtr<UC_GlyphBase> RunningGlyph;
 
 	FBaseGlyphContext RunningContext;
+
+	TWeakObjectPtr<UAnimMontage>RunningMontage;
 
 	int32  ChargeIndex = -1;
 
 	float ChargeStartTime = 0.f;
 
 	float IndexChangeTime = 0.f;
+
+	void PlayChargeMontage(UAnimMontage* Montage);
+
+	void StopChargeMontage(UAnimMontage* Montage);
 
 	void SettleCharge(FBaseGlyphContext& Context, float ChargeTime);
 
