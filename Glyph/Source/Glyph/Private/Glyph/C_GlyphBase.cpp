@@ -2,7 +2,7 @@
 
 
 #include "Glyph/C_GlyphBase.h"
-#include "Abilities/GameplayAbility.h"
+#include "Ability/C_GameplayAbility.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Glyph/C_GlyphSpawnActor.h"
@@ -21,17 +21,13 @@ void UC_GlyphBase::BaseEvent(EBaseEventType EventType, FBaseEventContext Context
     OnBaseEvent.Broadcast(EventType, Context);
 }
 
-void UC_GlyphBase::MontageEnd()
+void UC_GlyphBase::TryEndAbility()
 {
     if (!OwningAbility.IsValid())return;
-    if (!OwningAbility->IsActive()) return;
-    UAbilitySystemComponent* ASC = OwningAbility.Get()->GetAbilitySystemComponentFromActorInfo();
-    FGameplayAbilitySpecHandle Handle = OwningAbility->GetCurrentAbilitySpecHandle();
-    if (!IsValid(ASC))return;
-    if (!Handle.IsValid())return;
-    ASC->CancelAbilityHandle(Handle);
+    UC_GameplayAbility* Ability = Cast<UC_GameplayAbility>(OwningAbility.Get());
+    if (!IsValid(Ability))return;
+    if (Ability->IsActive())Ability->EndAbilityFormRef();
 }
-
 
 UAbilityTask_WaitGameplayEvent* UC_GlyphBase::CreateWaitGameplayEventTask(FGameplayTag EventTag, AActor* OptionalExternalTarget, bool OnlyTriggerOnce, bool OnlyMatchExact)
 {
@@ -39,7 +35,7 @@ UAbilityTask_WaitGameplayEvent* UC_GlyphBase::CreateWaitGameplayEventTask(FGamep
 
     // 直接调用工厂函数生成，激活并返回
     UAbilityTask_WaitGameplayEvent* Task = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(OwningAbility.Get(), EventTag, OptionalExternalTarget, OnlyTriggerOnce, OnlyMatchExact);
-    Task->Activate();
+    if(IsValid(Task))Task->ReadyForActivation();
     return Task;
 }
 
@@ -47,13 +43,15 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
 {
     if (!OwningAbility.IsValid())return nullptr;
 
-    // 直接调用工厂函数生成，激活,绑定并返回
+    // 直接调用工厂函数生成，激活,绑定默认结束ability并返回
     UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(OwningAbility.Get(), TaskInstanceName, MontageToPlay, Rate, StartSection, bStopWhenAbilityEnds, AnimRootMotionTranslationScale, StartTimeSeconds, bAllowInterruptAfterBlendOut);
-    Task->Activate();
-    Task->OnBlendOut.AddUniqueDynamic(this, &ThisClass::MontageEnd);
-    Task->OnCancelled.AddUniqueDynamic(this, &ThisClass::MontageEnd);
-    Task->OnCompleted.AddUniqueDynamic(this, &ThisClass::MontageEnd);
-    Task->OnInterrupted.AddUniqueDynamic(this, &ThisClass::MontageEnd);
+    if (IsValid(Task)) {
+        Task->ReadyForActivation();
+        Task->OnBlendOut.AddUniqueDynamic(this, &ThisClass::TryEndAbility);
+        Task->OnCancelled.AddUniqueDynamic(this, &ThisClass::TryEndAbility);
+        Task->OnCompleted.AddUniqueDynamic(this, &ThisClass::TryEndAbility);
+        Task->OnInterrupted.AddUniqueDynamic(this, &ThisClass::TryEndAbility);
+    }
     return Task;
 }
 

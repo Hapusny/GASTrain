@@ -8,6 +8,7 @@
 #include "C_GlyphBase.generated.h"
 
 class UGameplayAbility;
+class UAbilityTask;
 class UAbilityTask_WaitGameplayEvent;
 class UAbilityTask_PlayMontageAndWait;
 class AC_GlyphSpawnActor;
@@ -170,8 +171,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
 	void BaseEventReceived(EBaseEventType EventType, FBaseEventContext Context);
 
-private:
-	UFUNCTION()
-	void MontageEnd();
+	UFUNCTION(BlueprintCallable, Category = "C|Glyph")
+	void TryEndAbility();
 
 };

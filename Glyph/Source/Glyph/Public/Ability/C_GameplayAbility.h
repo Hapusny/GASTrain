@@ -22,4 +22,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "C|Ability")
 	EGlyphType SlotType;
+
+	void EndAbilityFormRef();
 };

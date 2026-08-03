@@ -15,3 +15,8 @@ void UC_GameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	if (!IsValid(GIC))return;
 	if(!GIC->ActivateSlotGlyph(SlotType,this))EndAbility(Handle, ActorInfo, ActivationInfo,false,true);
 }
+
+void UC_GameplayAbility::EndAbilityFormRef()
+{
+	EndAbility(GetCurrentAbilitySpecHandle(),GetCurrentActorInfo(),GetCurrentActivationInfo(),true,false);
+}
