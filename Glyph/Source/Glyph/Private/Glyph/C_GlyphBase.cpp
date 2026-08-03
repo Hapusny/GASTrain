@@ -234,6 +234,11 @@ TArray<AActor*> UC_GlyphBase::LineCollisionHitCheck(AActor* AvatarActor, float L
     return ActorsHit;
 }
 
+FBaseGlyphContext UC_GlyphBase::PreProcessContext_Implementation(EGlyphType BaseGlyphType, FBaseGlyphContext Context)
+{
+    return Context;
+}
+
 
 
 

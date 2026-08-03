@@ -146,7 +146,7 @@ public:
 	TArray<AActor*> LineCollisionHitCheck(AActor* AvatarActor, float Length, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
 
 	//Glyph Ability
-	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Variant")
+	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Variant")
 	FBaseGlyphContext PreProcessContext(EGlyphType BaseGlyphType, FBaseGlyphContext Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph")
