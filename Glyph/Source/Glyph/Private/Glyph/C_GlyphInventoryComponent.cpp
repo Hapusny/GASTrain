@@ -126,15 +126,15 @@ bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGamepla
 	}
 
 	//蓄力输出模式处理
-	if (RunningContext.ChargeTime.IsEmpty())BaseGlyph->ActivateGlyph(RunningContext);
+	if (RunningContext.ChargeContexts.IsEmpty())BaseGlyph->ActivateGlyph(RunningContext);
 	else {
 		if (!IsValid(GetWorld()))return false;
 		RunningGlyph = MakeWeakObjectPtr<UC_GlyphBase>(BaseGlyph);
 		ChargeStartTime = GetWorld()->GetTimeSeconds();
 		IndexChangeTime = GetWorld()->GetTimeSeconds();
 		ChargeIndex = 0;
-		if (RunningGlyph.IsValid() && RunningContext.ChargeMontage.Num() > ChargeIndex && IsValid(RunningContext.ChargeMontage[ChargeIndex])) {
-			RunningMontage = MakeWeakObjectPtr<UAnimMontage>(RunningContext.ChargeMontage[ChargeIndex]);
+		if (RunningGlyph.IsValid() && RunningContext.ChargeContexts.Num() > ChargeIndex && IsValid(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage)) {
+			RunningMontage = MakeWeakObjectPtr<UAnimMontage>(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage);
 			if(RunningMontage.IsValid())PlayChargeMontage(RunningMontage.Get());
 		}
 	}
@@ -144,7 +144,7 @@ bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGamepla
 void UC_GlyphInventoryComponent::EndRunningCharge()
 {
 	if (!RunningGlyph.IsValid())return;
-	if (ChargeIndex != -1 && ChargeIndex < RunningContext.ChargeTime.Num()) {
+	if (ChargeIndex != -1 && ChargeIndex < RunningContext.ChargeContexts.Num()) {
 		ChargeIndex = -1;
 		if (RunningMontage.IsValid())StopChargeMontage(RunningMontage.Get());
 		if (!IsValid(GetWorld()))return;
@@ -166,16 +166,16 @@ void UC_GlyphInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (!IsValid(GetWorld()))return;
 	if (ChargeIndex != -1) {
-		if (ChargeIndex >= RunningContext.ChargeTime.Num()) {
+		if (ChargeIndex >= RunningContext.ChargeContexts.Num()) {
 			ChargeIndex = -1;
 			if(RunningMontage.IsValid())StopChargeMontage(RunningMontage.Get());
 			SettleCharge(RunningContext, GetWorld()->GetTimeSeconds() - ChargeStartTime);
 			RunningGlyph->ActivateGlyph(RunningContext);
 		}
-		else if ((GetWorld()->GetTimeSeconds() - IndexChangeTime) >= RunningContext.ChargeTime[ChargeIndex]) {
+		else if ((GetWorld()->GetTimeSeconds() - IndexChangeTime) >= RunningContext.ChargeContexts[ChargeIndex].ChargeTime) {
 			ChargeIndex++;
-			if (RunningGlyph.IsValid() && RunningContext.ChargeMontage.Num() > ChargeIndex && IsValid(RunningContext.ChargeMontage[ChargeIndex])) {
-				RunningMontage = MakeWeakObjectPtr<UAnimMontage>(RunningContext.ChargeMontage[ChargeIndex]);
+			if (RunningGlyph.IsValid() && RunningContext.ChargeContexts.Num() > ChargeIndex && IsValid(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage)) {
+				RunningMontage = MakeWeakObjectPtr<UAnimMontage>(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage);
 				if (RunningMontage.IsValid())PlayChargeMontage(RunningMontage.Get());
 			}
 			IndexChangeTime = GetWorld()->GetTimeSeconds();
@@ -227,15 +227,15 @@ void UC_GlyphInventoryComponent::BindGlyph()
 	UC_GlyphBase* Base, *Variant;
 	Base = AttackSlot[0].Get();
 	Variant = AttackSlot[1].Get();
-	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddUObject(Variant, &UC_GlyphBase::BaseEventReceived);
 
 	Base = SkillSlot[0].Get();
 	Variant = SkillSlot[1].Get();
-	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddUObject(Variant, &UC_GlyphBase::BaseEventReceived);
 
 	Base = MoveSlot[0].Get();
 	Variant = MoveSlot[1].Get();
-	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.AddUObject(Variant, &UC_GlyphBase::BaseEventReceived);
 
 }
 
@@ -244,15 +244,15 @@ void UC_GlyphInventoryComponent::UnbindGlyph()
 	UC_GlyphBase* Base, * Variant;
 	Base = AttackSlot[0].Get();
 	Variant = AttackSlot[1].Get();
-	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveAll(Variant);
 
 	Base = SkillSlot[0].Get();
 	Variant = SkillSlot[1].Get();
-	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveAll(Variant);
 
 	Base = MoveSlot[0].Get();
 	Variant = MoveSlot[1].Get();
-	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveDynamic(Variant, &UC_GlyphBase::BaseEventReceived);
+	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveAll(Variant);
 }
 
 void UC_GlyphInventoryComponent::PlayChargeMontage(UAnimMontage* Montage)
@@ -276,16 +276,29 @@ void UC_GlyphInventoryComponent::StopChargeMontage(UAnimMontage* Montage)
 	}
 }
 
-void UC_GlyphInventoryComponent::SettleCharge(FBaseGlyphContext& Context, float ChargeTime)
+void UC_GlyphInventoryComponent::SettleCharge(FGlyphConfigurationContext& Context, float ChargeTime)
 {
-	for (int i = 0; i < Context.ChargeTime.Num(); i++) {
-		if (ChargeTime >= Context.ChargeTime[i]) {
+	for (int i = 0; i < Context.ChargeContexts.Num(); i++) {
+		if (ChargeTime >= Context.ChargeContexts[i].ChargeTime) {
 			//执行对应蓄力修饰
-
-			ChargeTime -= Context.ChargeTime[i];
+			ApplyChargeRate(Context, i, 1.f);
+			ChargeTime -= Context.ChargeContexts[i].ChargeTime;
 		}
 		else {
 			//按比率执行修饰
+			ApplyChargeRate(Context, i, ChargeTime / Context.ChargeContexts[i].ChargeTime);
+			break;
 		}
 	}
+}
+
+void UC_GlyphInventoryComponent::ApplyChargeRate(FGlyphConfigurationContext& Context, int Index, float TimeRate)
+{
+	Context.Damage *= (Context.ChargeContexts[Index].DamageRate - 1.f) * TimeRate + 1.f;
+	Context.CollisionSize *= (Context.ChargeContexts[Index].CollisionSizeRate - 1.f) * TimeRate + 1.f;
+	Context.SpawnActorContext.Damage *= (Context.ChargeContexts[Index].SpawnActorDamageRate - 1.f) * TimeRate + 1.f;
+	Context.SpawnActorContext.Size *= (Context.ChargeContexts[Index].SpawnActorSizeRate - 1.f) * TimeRate + 1.f;
+	Context.SpawnActorContext.FireSpeed *= (Context.ChargeContexts[Index].SpawnActorSpeedRate - 1.f) * TimeRate + 1.f;
+	Context.EffectTime *= (Context.ChargeContexts[Index].EffectTimeRate - 1.f) * TimeRate + 1.f;
+	Context.MoveFactor *= (Context.ChargeContexts[Index].MoveFactorRate - 1.f) * TimeRate + 1.f;
 }

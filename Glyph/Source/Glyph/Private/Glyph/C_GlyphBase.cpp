@@ -9,14 +9,14 @@
 #include "Character/C_BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 
-void UC_GlyphBase::ActivateGlyph(FBaseGlyphContext Context)
+void UC_GlyphBase::ActivateGlyph(const FGlyphConfigurationContext& Context)
 {
     if (GlyphType == EGlyphType::AttackBase)AttackBase(Context);
     if (GlyphType == EGlyphType::SkillBase)SkillBase(Context);
     if (GlyphType == EGlyphType::MoveBase)MoveBase(Context);
 }
 
-void UC_GlyphBase::BaseEvent(EBaseEventType EventType, FBaseEventContext Context)
+void UC_GlyphBase::BaseEvent(EBaseEventType EventType, const FGlyphEventContext& Context)
 {
     OnBaseEvent.Broadcast(EventType, Context);
 }
@@ -27,6 +27,16 @@ void UC_GlyphBase::TryEndAbility()
     UC_GameplayAbility* Ability = Cast<UC_GameplayAbility>(OwningAbility.Get());
     if (!IsValid(Ability))return;
     if (Ability->IsActive())Ability->EndAbilityFormRef();
+}
+
+void UC_GlyphBase::InitializeActorByContext(AC_GlyphSpawnActor* Actor, const FGlyphSpawnActorContext& Context)
+{
+    if (!IsValid(Actor))return;
+    Actor->SpawnActorType = Context.SpawnType;
+    Actor->Damage = Context.Damage;
+    Actor->DamageAttribute = Context.DamageAttribute;
+    Actor->FireSpeed = Context.FireSpeed;
+    Actor->bCanPenetrate = Context.bCanPenetrate;
 }
 
 UAbilityTask_WaitGameplayEvent* UC_GlyphBase::CreateWaitGameplayEventTask(FGameplayTag EventTag, AActor* OptionalExternalTarget, bool OnlyTriggerOnce, bool OnlyMatchExact)
@@ -55,7 +65,7 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
     return Task;
 }
 
-TArray<AActor*> UC_GlyphBase::SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, FTransform Transform, int Number, ESpawnActorType SpawnActorType, float OrbitDistance, float OrbitAngleSpeed)
+TArray<AActor*> UC_GlyphBase::SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorClass, const FGlyphSpawnActorContext& GlyphSpawnActorContext)
 {
     UWorld* World = GetWorld();
     TArray<AActor*> Actors;
@@ -70,30 +80,40 @@ TArray<AActor*> UC_GlyphBase::SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorCl
     //Éú³É
     AC_GlyphSpawnActor* SpawnedActor;
 
-    switch (SpawnActorType)
+    FTransform Transform;
+    if (!GlyphSpawnActorContext.bOverrideOrigin)Transform.SetLocation(Owner->GetActorLocation());
+    else Transform.SetLocation(GlyphSpawnActorContext.Origin);
+    Transform.SetLocation(Transform.GetLocation() + Owner->GetActorForwardVector() * GlyphSpawnActorContext.ForwardOffset + FVector(0.f, 0.f, GlyphSpawnActorContext.ElevationOffset));
+
+    if (!GlyphSpawnActorContext.bOverrideRotation)Transform.SetRotation(Owner->GetActorRotation().Quaternion());
+    else Transform.SetRotation(GlyphSpawnActorContext.Rotation);
+
+    Transform.SetScale3D(GlyphSpawnActorContext.Size);
+
+    switch (GlyphSpawnActorContext.SpawnType)
     {
-    case ESpawnActorType::None:
-        SpawnedActor = World->SpawnActorDeferred<AC_GlyphSpawnActor>(ActorClass,Transform,Owner,Owner,ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+    case EGlyphSpawnActorType::None:
+        SpawnedActor = World->SpawnActorDeferred<AC_GlyphSpawnActor>(ActorClass, Transform, Owner, Owner, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
         if (SpawnedActor) {
             SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(this);
-            SpawnedActor->SpawnActorType = SpawnActorType;
+            InitializeActorByContext(SpawnedActor, GlyphSpawnActorContext);
 
             SpawnedActor->FinishSpawning(Transform);
         }
         Actors.Add(SpawnedActor);
         break;
 
-    case ESpawnActorType::Orbit:
-        for (int i = 0; i < Number; i++) {
+    case EGlyphSpawnActorType::Orbit:
+        for (int i = 0; i < GlyphSpawnActorContext.Number; i++) {
             SpawnedActor = World->SpawnActorDeferred<AC_GlyphSpawnActor>(ActorClass, Transform, Owner, Owner, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
             if (SpawnedActor) {
                 SpawnedActor->Glyph = TWeakObjectPtr<UC_GlyphBase>(this);
-                SpawnedActor->SpawnActorType = SpawnActorType;
-                SpawnedActor->SetOrbit(OrbitDistance, OrbitAngleSpeed, 360.f / Number * i);
-                
+                InitializeActorByContext(SpawnedActor, GlyphSpawnActorContext);
+                SpawnedActor->SetOrbit(GlyphSpawnActorContext.OrbitDistance, GlyphSpawnActorContext.OrbitAngleSpeed, 360.f / GlyphSpawnActorContext.Number * i);
+
                 SpawnedActor->FinishSpawning(Transform);
             }
-            Actors.Add(SpawnedActor);
+            if (SpawnedActor) Actors.Add(SpawnedActor);
         }
         break;
     default:
@@ -234,7 +254,7 @@ TArray<AActor*> UC_GlyphBase::LineCollisionHitCheck(AActor* AvatarActor, float L
     return ActorsHit;
 }
 
-FBaseGlyphContext UC_GlyphBase::PreProcessContext_Implementation(EGlyphType BaseGlyphType, FBaseGlyphContext Context)
+FGlyphConfigurationContext UC_GlyphBase::PreProcessContext_Implementation(EGlyphType BaseGlyphType, FGlyphConfigurationContext Context)
 {
     return Context;
 }

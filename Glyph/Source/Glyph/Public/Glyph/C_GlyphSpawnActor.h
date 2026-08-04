@@ -4,16 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "C_GlyphBase.h"
 #include "C_GlyphSpawnActor.generated.h"
 
-class UC_GlyphBase;
-
-UENUM(BlueprintType)
-enum class ESpawnActorType : uint8
-{
-	None,
-	Orbit
-};
 
 UCLASS()
 class GLYPH_API AC_GlyphSpawnActor : public AActor
@@ -27,7 +20,19 @@ public:
 	TWeakObjectPtr<UC_GlyphBase>Glyph;
 
 	UPROPERTY(BlueprintReadOnly, Category = "C|Actor")
-	ESpawnActorType SpawnActorType = ESpawnActorType::None;
+	EGlyphSpawnActorType SpawnActorType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C|Actor|Damage")
+	float Damage = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C|Actor|Damage")
+	EGlyphAttribute DamageAttribute = EGlyphAttribute::None;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C|Actor")
+	float FireSpeed = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C|Actor")
+	bool bCanPenetrate = false;
 
 	void SetOrbit(float Distance, float AngleSpeed,float Angle);
 

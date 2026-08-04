@@ -19,7 +19,7 @@ void AC_GlyphSpawnActor::SetOrbit(float Distance, float AngleSpeed,float Angle)
 void AC_GlyphSpawnActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (SpawnActorType == ESpawnActorType::Orbit) {
+	if (SpawnActorType == EGlyphSpawnActorType::Orbit) {
 		if (!IsValid(GetOwner()))return;
 		FVector TargetLocation = FVector(OrbitDistance, 0.f, 0.f).RotateAngleAxis(OrbitAngle, FVector(0.f, 0.f, 1.f)) + GetOwner()->GetActorLocation();
 		SetActorLocation(TargetLocation);

@@ -72,7 +72,7 @@ private:
 	//ChargeInput
 	TWeakObjectPtr<UC_GlyphBase> RunningGlyph;
 
-	FBaseGlyphContext RunningContext;
+	FGlyphConfigurationContext RunningContext;
 
 	TWeakObjectPtr<UAnimMontage>RunningMontage;
 
@@ -86,6 +86,8 @@ private:
 
 	void StopChargeMontage(UAnimMontage* Montage);
 
-	void SettleCharge(FBaseGlyphContext& Context, float ChargeTime);
+	void SettleCharge(FGlyphConfigurationContext& Context, float ChargeTime);
+
+	void ApplyChargeRate(FGlyphConfigurationContext& Context, int Index ,float TimeRate);
 
 };
