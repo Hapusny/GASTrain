@@ -11,9 +11,10 @@
 
 void UC_GlyphBase::ActivateGlyph(const FGlyphConfigurationContext& Context)
 {
-    if (GlyphType == EGlyphType::AttackBase)AttackBase(Context);
-    if (GlyphType == EGlyphType::SkillBase)SkillBase(Context);
-    if (GlyphType == EGlyphType::MoveBase)MoveBase(Context);
+    RunningConfiguration = Context;
+    if (GlyphType == EGlyphType::AttackBase)AttackBase();
+    if (GlyphType == EGlyphType::SkillBase)SkillBase();
+    if (GlyphType == EGlyphType::MoveBase)MoveBase();
 }
 
 void UC_GlyphBase::BaseEvent(EBaseEventType EventType, const FGlyphEventContext& Context)

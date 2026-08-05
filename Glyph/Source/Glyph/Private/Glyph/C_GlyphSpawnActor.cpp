@@ -3,10 +3,14 @@
 
 #include "Glyph/C_GlyphSpawnActor.h"
 #include "Glyph/C_GlyphBase.h"
+#include "Glyph/C_TravelEventComponent.h"
 
 AC_GlyphSpawnActor::AC_GlyphSpawnActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	DamageAttribute = EGlyphAttribute::None;
+	SpawnActorType = EGlyphSpawnActorType::None;
+	TravelEventComponent = CreateDefaultSubobject<UC_TravelEventComponent>("TravelEventComponent");
 }
 
 void AC_GlyphSpawnActor::SetOrbit(float Distance, float AngleSpeed,float Angle)

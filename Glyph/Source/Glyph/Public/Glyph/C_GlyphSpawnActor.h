@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "C_GlyphBase.h"
 #include "C_GlyphSpawnActor.generated.h"
 
+class UC_GlyphBase;
+enum class EGlyphSpawnActorType :uint8;
+enum class EGlyphAttribute :uint8;
+class UC_TravelEventComponent;
 
 UCLASS()
 class GLYPH_API AC_GlyphSpawnActor : public AActor
@@ -26,7 +29,7 @@ public:
 	float Damage = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C|Actor|Damage")
-	EGlyphAttribute DamageAttribute = EGlyphAttribute::None;
+	EGlyphAttribute DamageAttribute;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C|Actor")
 	float FireSpeed = 0.f;
@@ -35,6 +38,9 @@ public:
 	bool bCanPenetrate = false;
 
 	void SetOrbit(float Distance, float AngleSpeed,float Angle);
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UC_TravelEventComponent>TravelEventComponent;
 
 protected:
 	virtual void Tick(float DeltaTime) override;

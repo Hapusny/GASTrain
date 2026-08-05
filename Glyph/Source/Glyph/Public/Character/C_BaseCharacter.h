@@ -9,6 +9,7 @@
 
 
 class UC_GlyphInventoryComponent;
+class UC_TravelEventComponent;
 class UGameplayAbility;
 class UAttributeSet;
 
@@ -25,6 +26,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UC_GlyphInventoryComponent>GlyphInventoryComponent;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UC_TravelEventComponent>TravelEventComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = "C|Ability")
 	TArray<TSubclassOf<UGameplayAbility>>StartupAbilities;

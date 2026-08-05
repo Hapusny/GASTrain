@@ -220,13 +220,9 @@ struct FGlyphEventContext
 {
 	GENERATED_BODY()
 
-	//本位刻印引用（用于获取刻印不变信息：ID、名称、图标等） 
+	//本位刻印引用（用于获取刻印信息及使用刻印函数） 
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
 	UC_GlyphBase* BaseGlyph = nullptr;
-
-	//当前配置快照（只读，包含经过蓄力和变位修改后的所有参数） 
-	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
-	FGlyphConfigurationContext CurrentContext;
 
 	//事件发生位置 
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
@@ -236,9 +232,9 @@ struct FGlyphEventContext
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
 	FVector EventToward = FVector::ZeroVector;
 
-	//碰撞结果数组（支持多目标命中） 
+	//碰撞目标
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
-	TArray<FHitResult> HitResults;
+	AActor* HitActor;
 };
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FBaseEventReceived, EBaseEventType, const FGlyphEventContext&);
@@ -275,6 +271,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph|Move")
 	FGlyphConfigurationContext MoveConfiguration;
 
+	UPROPERTY(BlueprintReadOnly, Category = "C|Glyph")
+	FGlyphConfigurationContext RunningConfiguration;
+
 	//Tool Function
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Tasks")
 	UAbilityTask_WaitGameplayEvent* CreateWaitGameplayEventTask(FGameplayTag EventTag, AActor* OptionalExternalTarget = nullptr, bool OnlyTriggerOnce = false, bool OnlyMatchExact = true);
@@ -304,13 +303,13 @@ public:
 	void ActivateGlyph(const FGlyphConfigurationContext& Context);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
-	void AttackBase(const FGlyphConfigurationContext& Context);
+	void AttackBase();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
-	void SkillBase(const FGlyphConfigurationContext& Context);
+	void SkillBase();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
-	void MoveBase(const FGlyphConfigurationContext& Context);
+	void MoveBase();
 
 	FBaseEventReceived OnBaseEvent;
 

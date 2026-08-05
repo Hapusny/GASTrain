@@ -3,6 +3,7 @@
 
 #include "Character/C_BaseCharacter.h"
 #include "Glyph/C_GlyphInventoryComponent.h"
+#include "Glyph/C_TravelEventComponent.h"
 #include "AbilitySystemComponent.h"
 
 // Sets default values
@@ -10,6 +11,7 @@ AC_BaseCharacter::AC_BaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	GlyphInventoryComponent = CreateDefaultSubobject<UC_GlyphInventoryComponent>("GlyphInventoryComponent");
+	TravelEventComponent = CreateDefaultSubobject<UC_TravelEventComponent>("TravelEventComponent");
 }
 
 UAbilitySystemComponent* AC_BaseCharacter::GetAbilitySystemComponent() const
