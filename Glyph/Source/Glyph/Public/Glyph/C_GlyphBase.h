@@ -10,6 +10,7 @@ class UGameplayAbility;
 class UAbilityTask;
 class UAbilityTask_WaitGameplayEvent;
 class UAbilityTask_PlayMontageAndWait;
+class UGameplayEffect;
 
 
 UENUM(BlueprintType)
@@ -293,6 +294,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C|Tool|Collision")
 	TArray<AActor*> LineCollisionHitCheck(AActor* AvatarActor, float Length, float HitBoxForwardOffset = 0.f, float HitBoxElevationOffset = 0.f, bool bDrawDebugs = false);
 
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Damage")
+	float ApplyDamageToTarget(AActor* Target, float Damage,EGlyphAttribute Attribute,TSubclassOf<UGameplayEffect> DamageEffect, UObject* OptionalParticleSystem = nullptr);
+
+	UFUNCTION(BlueprintCallable, Category = "C|Tool|Effect")
+	void ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> Effect, float Duration = 0.f,float Level = 1.f);
+
 	//Glyph Ability
 	UFUNCTION(BlueprintNativeEvent, Category = "C|Glyph|Variant")
 	FGlyphConfigurationContext PreProcessContext(EGlyphType BaseGlyphType, FGlyphConfigurationContext Context);
@@ -300,7 +307,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph")
 	void PreActivate();
 
-	void ActivateGlyph(const FGlyphConfigurationContext& Context);
+	void ActivateGlyph();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph|Base")
 	void AttackBase();

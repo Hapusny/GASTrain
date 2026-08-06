@@ -8,10 +8,12 @@
 #include "Glyph/C_GlyphSpawnActor.h"
 #include "Character/C_BaseCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "Ability/C_AttributeSet.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Ability/C_Tags.h"
 
-void UC_GlyphBase::ActivateGlyph(const FGlyphConfigurationContext& Context)
+void UC_GlyphBase::ActivateGlyph()
 {
-    RunningConfiguration = Context;
     if (GlyphType == EGlyphType::AttackBase)AttackBase();
     if (GlyphType == EGlyphType::SkillBase)SkillBase();
     if (GlyphType == EGlyphType::MoveBase)MoveBase();
@@ -186,7 +188,7 @@ TArray<AActor*> UC_GlyphBase::BoxCollisionOverlapCheck(AActor* AvatarActor, FVec
 
     UWorld* World = AvatarActor->GetWorld();
     if (!IsValid(World))return TArray<AActor*>();
-    World->OverlapMultiByChannel(OverlapResults, HitBoxLocation, FQuat::Identity, ECC_Pawn, Box, QueryParams, ResponseParams);
+    World->OverlapMultiByChannel(OverlapResults, HitBoxLocation, AvatarActor->GetActorRotation().Quaternion(), ECC_Pawn, Box, QueryParams, ResponseParams);
 
     TArray<AActor*> ActorsHit;
 
@@ -198,7 +200,26 @@ TArray<AActor*> UC_GlyphBase::BoxCollisionOverlapCheck(AActor* AvatarActor, FVec
 
     if (bDrawDebugs)
     {
-        DrawDebugBox(World, HitBoxLocation, BoxSize,FColor::Red, false, 3.f);
+        FQuat Rotation = AvatarActor->GetActorRotation().Quaternion();
+        FVector Extent = BoxSize;
+
+        // 8个顶点
+        FVector Corners[8];
+        int32 Index = 0;
+        for (int32 X = -1; X <= 1; X += 2) {
+            for (int32 Y = -1; Y <= 1; Y += 2) {
+                for (int32 Z = -1; Z <= 1; Z += 2) {
+                    Corners[Index++] = HitBoxLocation + Rotation.RotateVector(FVector(X * Extent.X, Y * Extent.Y, Z * Extent.Z));
+                }
+            }
+        }
+
+        // 12条边的索引
+        int32 Edges[12][2] = {{0,1}, {0,2}, {0,4},{1,3}, {1,5},{2,3}, {2,6},{3,7},{4,5}, {4,6},{5,7},{6,7}};
+
+        for (const auto& Edge : Edges) {
+            DrawDebugLine(World, Corners[Edge[0]], Corners[Edge[1]], FColor::Red, false, 3.f);
+        }
 
         for (const FOverlapResult& Result : OverlapResults) {
             if (IsValid(Result.GetActor())) {
@@ -214,7 +235,6 @@ TArray<AActor*> UC_GlyphBase::BoxCollisionOverlapCheck(AActor* AvatarActor, FVec
 TArray<AActor*> UC_GlyphBase::LineCollisionHitCheck(AActor* AvatarActor, float Length, float HitBoxForwardOffset, float HitBoxElevationOffset, bool bDrawDebugs)
 {
     if (!IsValid(AvatarActor))return TArray<AActor*>();
-
     FCollisionQueryParams QueryParams;
     QueryParams.AddIgnoredActor(AvatarActor);
 
@@ -253,6 +273,72 @@ TArray<AActor*> UC_GlyphBase::LineCollisionHitCheck(AActor* AvatarActor, float L
         }
     }
     return ActorsHit;
+}
+
+float UC_GlyphBase::ApplyDamageToTarget(AActor* Target, float Damage, EGlyphAttribute Attribute, TSubclassOf<UGameplayEffect> DamageEffect,UObject* OptionalParticleSystem)
+{
+    if (!IsValid(Target))return 0.f;
+    AC_BaseCharacter* TargetCharacter = Cast<AC_BaseCharacter>(Target);
+    if (!IsValid(TargetCharacter))return 0.f;
+    UAbilitySystemComponent* ASC = TargetCharacter->GetAbilitySystemComponent();
+    if (!IsValid(ASC))return 0.f;
+
+    //伤害处理
+    UC_AttributeSet* AttributeSet = Cast<UC_AttributeSet>(TargetCharacter->GetAttributeSet());
+    if (IsValid(AttributeSet)) {
+        float Resistance = 0.f;
+        switch (Attribute)
+        {
+        case EGlyphAttribute::Fire:   Resistance = AttributeSet->GetFireResistance(); break;
+        case EGlyphAttribute::Water:  Resistance = AttributeSet->GetWaterResistance(); break;
+        case EGlyphAttribute::Wind:   Resistance = AttributeSet->GetWindResistance(); break;
+        case EGlyphAttribute::Soil:   Resistance = AttributeSet->GetSoilResistance(); break;
+        default: break;
+        }
+        Resistance = FMath::Clamp(Resistance, 0.f, 1.f);
+        Damage *= (1.f - Resistance);
+    }
+    Damage = FMath::Max(0.f, Damage);
+    if (IsValid(DamageEffect)) {
+        FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+        FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DamageEffect, 1.f, ContextHandle);
+
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, CTags::Datas::Damage, -Damage);
+
+        ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+    }
+
+    //命中事件
+    FGameplayEventData Payload;
+    Payload.Instigator = OwningAbility->GetAvatarActorFromActorInfo();
+    Payload.Target = TargetCharacter;
+    Payload.EventMagnitude = Damage;
+    Payload.OptionalObject = OptionalParticleSystem;
+    UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetCharacter, CTags::Events::Hit, Payload);
+
+    FGlyphEventContext EventContext;
+    EventContext.BaseGlyph = this;
+    EventContext.HitActor = TargetCharacter;
+    BaseEvent(EBaseEventType::OnHit, EventContext);
+
+    return Damage;
+}
+
+void UC_GlyphBase::ApplyEffectToTarget(AActor* Target, TSubclassOf<UGameplayEffect> Effect, float Duration, float Level)
+{
+    if (!IsValid(Effect))return;
+    if (!IsValid(Target))return;
+    AC_BaseCharacter* TargetCharacter = Cast<AC_BaseCharacter>(Target);
+    if (!IsValid(TargetCharacter))return;
+    UAbilitySystemComponent* ASC = TargetCharacter->GetAbilitySystemComponent();
+    if (!IsValid(ASC))return;
+    FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+    FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(Effect, Level, ContextHandle);
+
+    if (Duration != 0.f)UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, CTags::Datas::Duration, Duration);
+
+    ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+
 }
 
 FGlyphConfigurationContext UC_GlyphBase::PreProcessContext_Implementation(EGlyphType BaseGlyphType, FGlyphConfigurationContext Context)

@@ -30,7 +30,27 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData MaxHealth;
 
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData FireResistance;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData WaterResistance;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData WindResistance;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData SoilResistance;
+
 	ATTRIBUTE_ACCESSORS(ThisClass, Health);
 
 	ATTRIBUTE_ACCESSORS(ThisClass, MaxHealth);
+
+	ATTRIBUTE_ACCESSORS(ThisClass, FireResistance);
+
+	ATTRIBUTE_ACCESSORS(ThisClass, WaterResistance);
+
+	ATTRIBUTE_ACCESSORS(ThisClass, WindResistance);
+
+	ATTRIBUTE_ACCESSORS(ThisClass, SoilResistance);
 };

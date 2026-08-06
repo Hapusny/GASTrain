@@ -82,7 +82,7 @@ private:
 
 	float IndexChangeTime = 0.f;
 
-	void PlayChargeMontage(UAnimMontage* Montage);
+	void PlayChargeMontage(UAnimMontage* Montage,float Rate);
 
 	void StopChargeMontage(UAnimMontage* Montage);
 

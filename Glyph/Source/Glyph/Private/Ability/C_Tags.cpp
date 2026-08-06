@@ -4,12 +4,21 @@
 #include "Ability/C_Tags.h"
 
 namespace CTags {
-	namespace CAbilities
+	namespace Abilities
 	{
-		
-		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack, "CTags.CAbilities.Attack", "Tag for the Attack Ability");
-		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Skill, "CTags.CAbilities.Skill", "Tag for the Skill Ability");
-		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Move, "CTags.CAbilities.Move", "Tag for the Move Ability");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Attack, "CTags.Abilities.Attack", "Tag for the Attack Ability");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Skill, "CTags.Abilities.Skill", "Tag for the Skill Ability");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Move, "CTags.Abilities.Move", "Tag for the Move Ability");
+	}
 
+	namespace Events
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Hit, "CTags.Events.Hit", "Tag for Event Hit");
+	}
+
+	namespace Datas 
+	{
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Damage, "CTags.Datas.Damage", "Tag for Data Damage");
+		UE_DEFINE_GAMEPLAY_TAG_COMMENT(Duration, "CTags.Datas.Duration", "Tag for Data Duration");
 	}
 }

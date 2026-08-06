@@ -60,17 +60,17 @@ void AC_PlayerController::Look(const FInputActionValue& Value)
 
 void AC_PlayerController::Attack()
 {
-	ActivateAbility(CTags::CAbilities::Attack);
+	ActivateAbility(CTags::Abilities::Attack);
 }
 
 void AC_PlayerController::Skill()
 {
-	ActivateAbility(CTags::CAbilities::Skill);
+	ActivateAbility(CTags::Abilities::Skill);
 }
 
 void AC_PlayerController::Move()
 {
-	ActivateAbility(CTags::CAbilities::Move);
+	ActivateAbility(CTags::Abilities::Move);
 }
 
 void AC_PlayerController::Menu()

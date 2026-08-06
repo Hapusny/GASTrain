@@ -21,6 +21,9 @@ void UC_GlyphInventoryComponent::AddGlyph(TSubclassOf<UC_GlyphBase> GlyphClass)
 {
 	UC_GlyphBase* NewGlyph = CreateGlyphInstance(GlyphClass);
 	if (!NewGlyph)return;
+
+	//Mvp阶段只有8个刻印，暂不处理超出库存和重复获取的情况
+
 	GlyphInventory.Add((NewGlyph));
 	OnGlyphInventoryChange.Broadcast(true, NewGlyph->GlyphName);
 }
@@ -116,26 +119,29 @@ bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGamepla
 	}
 
 	//预处理
-	BaseGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
-	BaseGlyph->PreActivate();
-
 	if (VariantGlyph != nullptr) {
 		VariantGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
 		RunningContext = VariantGlyph->PreProcessContext(SlotType,RunningContext);
 		VariantGlyph->PreActivate();
 	}
 
+	BaseGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
+	BaseGlyph->RunningConfiguration = RunningContext;
+	BaseGlyph->PreActivate();
+
+
 	//蓄力输出模式处理
-	if (RunningContext.ChargeContexts.IsEmpty())BaseGlyph->ActivateGlyph(RunningContext);
+	if (RunningContext.ChargeContexts.IsEmpty())BaseGlyph->ActivateGlyph();
 	else {
 		if (!IsValid(GetWorld()))return false;
 		RunningGlyph = MakeWeakObjectPtr<UC_GlyphBase>(BaseGlyph);
 		ChargeStartTime = GetWorld()->GetTimeSeconds();
 		IndexChangeTime = GetWorld()->GetTimeSeconds();
 		ChargeIndex = 0;
+		for (int i = 0; i < RunningContext.ChargeContexts.Num(); i++)RunningContext.ChargeContexts[i].ChargeTime /= RunningContext.MontageRate;
 		if (RunningGlyph.IsValid() && RunningContext.ChargeContexts.Num() > ChargeIndex && IsValid(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage)) {
 			RunningMontage = MakeWeakObjectPtr<UAnimMontage>(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage);
-			if(RunningMontage.IsValid())PlayChargeMontage(RunningMontage.Get());
+			if(RunningMontage.IsValid())PlayChargeMontage(RunningMontage.Get(),RunningContext.MontageRate);
 		}
 	}
 	return true;
@@ -149,7 +155,8 @@ void UC_GlyphInventoryComponent::EndRunningCharge()
 		if (RunningMontage.IsValid())StopChargeMontage(RunningMontage.Get());
 		if (!IsValid(GetWorld()))return;
 		SettleCharge(RunningContext, GetWorld()->GetTimeSeconds() - ChargeStartTime);
-		RunningGlyph->ActivateGlyph(RunningContext);
+		RunningGlyph->RunningConfiguration = RunningContext;
+		RunningGlyph->ActivateGlyph();
 	}
 }
 
@@ -170,13 +177,14 @@ void UC_GlyphInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickT
 			ChargeIndex = -1;
 			if(RunningMontage.IsValid())StopChargeMontage(RunningMontage.Get());
 			SettleCharge(RunningContext, GetWorld()->GetTimeSeconds() - ChargeStartTime);
-			RunningGlyph->ActivateGlyph(RunningContext);
+			RunningGlyph->RunningConfiguration = RunningContext;
+			RunningGlyph->ActivateGlyph();
 		}
 		else if ((GetWorld()->GetTimeSeconds() - IndexChangeTime) >= RunningContext.ChargeContexts[ChargeIndex].ChargeTime) {
 			ChargeIndex++;
 			if (RunningGlyph.IsValid() && RunningContext.ChargeContexts.Num() > ChargeIndex && IsValid(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage)) {
 				RunningMontage = MakeWeakObjectPtr<UAnimMontage>(RunningContext.ChargeContexts[ChargeIndex].ChargeMontage);
-				if (RunningMontage.IsValid())PlayChargeMontage(RunningMontage.Get());
+				if (RunningMontage.IsValid())PlayChargeMontage(RunningMontage.Get(), RunningContext.MontageRate);
 			}
 			IndexChangeTime = GetWorld()->GetTimeSeconds();
 		}
@@ -255,14 +263,14 @@ void UC_GlyphInventoryComponent::UnbindGlyph()
 	if (IsValid(Base) && IsValid(Variant))Base->OnBaseEvent.RemoveAll(Variant);
 }
 
-void UC_GlyphInventoryComponent::PlayChargeMontage(UAnimMontage* Montage)
+void UC_GlyphInventoryComponent::PlayChargeMontage(UAnimMontage* Montage, float Rate)
 {
 	// 获取角色和动画实例
 	AC_BaseCharacter* Owner = Cast<AC_BaseCharacter>(GetOwner());
 	if (Owner && Owner->GetMesh())
 	{
 		UAnimInstance* AnimInst = Owner->GetMesh()->GetAnimInstance();
-		if (AnimInst)AnimInst->Montage_Play(Montage, 1.0f);
+		if (AnimInst)AnimInst->Montage_Play(Montage, Rate);
 	}
 }
 
