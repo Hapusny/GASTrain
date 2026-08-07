@@ -257,6 +257,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph")
 	EGlyphAttribute GlyphAttribute = EGlyphAttribute::None;
 
+	UPROPERTY(BlueprintReadOnly, Category = "C|Glyph")
 	EGlyphType GlyphType = EGlyphType::None;
 
 	UPROPERTY(BlueprintReadOnly, Category = "C|Ability")
