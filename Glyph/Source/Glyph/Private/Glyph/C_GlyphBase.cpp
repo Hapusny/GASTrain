@@ -284,26 +284,30 @@ float UC_GlyphBase::ApplyDamageToTarget(AActor* Target, float Damage, EGlyphAttr
     if (!IsValid(ASC))return 0.f;
 
     //伤害处理
-    UC_AttributeSet* AttributeSet = Cast<UC_AttributeSet>(TargetCharacter->GetAttributeSet());
-    if (IsValid(AttributeSet)) {
-        float Resistance = 0.f;
-        switch (Attribute)
-        {
-        case EGlyphAttribute::Fire:   Resistance = AttributeSet->GetFireResistance(); break;
-        case EGlyphAttribute::Water:  Resistance = AttributeSet->GetWaterResistance(); break;
-        case EGlyphAttribute::Wind:   Resistance = AttributeSet->GetWindResistance(); break;
-        case EGlyphAttribute::Soil:   Resistance = AttributeSet->GetSoilResistance(); break;
-        default: break;
-        }
-        Resistance = FMath::Clamp(Resistance, 0.f, 1.f);
-        Damage *= (1.f - Resistance);
-    }
     Damage = FMath::Max(0.f, Damage);
     if (IsValid(DamageEffect)) {
         FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+        ContextHandle.AddSourceObject(this);
+
         FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DamageEffect, 1.f, ContextHandle);
 
-        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, CTags::Datas::Damage, -Damage);
+        UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, CTags::Datas::Damage, Damage);
+
+        //将枚举转为对应的元素Tag
+        FGameplayTag ElementTag;
+        switch (Attribute)
+        {
+        case EGlyphAttribute::Fire:  ElementTag = CTags::Datas::Elements::Fire; break;
+        case EGlyphAttribute::Water: ElementTag = CTags::Datas::Elements::Water; break;
+        case EGlyphAttribute::Wind:  ElementTag = CTags::Datas::Elements::Wind; break;
+        case EGlyphAttribute::Soil:  ElementTag = CTags::Datas::Elements::Soil; break;
+        default: break;
+        }
+
+        if (ElementTag.IsValid())
+        {
+            SpecHandle.Data->DynamicAssetTags.AddTag(ElementTag);
+        }
 
         ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
     }

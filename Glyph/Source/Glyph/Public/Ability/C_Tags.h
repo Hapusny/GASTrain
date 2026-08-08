@@ -19,8 +19,30 @@ namespace CTags
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Hit);
 	}
 
+	namespace States
+	{
+		namespace Buffs
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(DamageReduction);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Block);
+		}
+
+		namespace Debuffs
+		{
+
+		}
+	}
+
 	namespace Datas
 	{
+		namespace Elements
+		{
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Fire);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Water);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Wind);
+			UE_DECLARE_GAMEPLAY_TAG_EXTERN(Soil);
+		}
+
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Damage);
 		UE_DECLARE_GAMEPLAY_TAG_EXTERN(Duration);
 	}

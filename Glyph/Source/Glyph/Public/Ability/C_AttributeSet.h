@@ -24,11 +24,18 @@ class GLYPH_API UC_AttributeSet : public UAttributeSet
 
 public:
 
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)override;
+
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData Health;
 
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData MaxHealth;
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayAttributeData IncomingDamage;
 
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayAttributeData FireResistance;
@@ -46,6 +53,8 @@ public:
 
 	ATTRIBUTE_ACCESSORS(ThisClass, MaxHealth);
 
+	ATTRIBUTE_ACCESSORS(UC_AttributeSet, IncomingDamage);
+
 	ATTRIBUTE_ACCESSORS(ThisClass, FireResistance);
 
 	ATTRIBUTE_ACCESSORS(ThisClass, WaterResistance);
@@ -53,4 +62,7 @@ public:
 	ATTRIBUTE_ACCESSORS(ThisClass, WindResistance);
 
 	ATTRIBUTE_ACCESSORS(ThisClass, SoilResistance);
+
+private:
+	float CalculateFinalDamage(const FGameplayEffectModCallbackData& Data, float RawDamage) const;
 };
