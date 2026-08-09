@@ -21,7 +21,7 @@ public:
 	UC_GlyphInventoryComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
-	void AddGlyph(TSubclassOf<UC_GlyphBase> GlyphClass);
+	UC_GlyphBase* AddGlyph(TSubclassOf<UC_GlyphBase> GlyphClass);
 
 	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
 	void RemoveGlyph(UC_GlyphBase* TargetGlyph);

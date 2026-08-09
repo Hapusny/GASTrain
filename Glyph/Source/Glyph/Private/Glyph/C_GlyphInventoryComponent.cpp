@@ -17,15 +17,16 @@ UC_GlyphInventoryComponent::UC_GlyphInventoryComponent()
 	MoveSlot.Init(nullptr, 2);
 }
 
-void UC_GlyphInventoryComponent::AddGlyph(TSubclassOf<UC_GlyphBase> GlyphClass)
+UC_GlyphBase* UC_GlyphInventoryComponent::AddGlyph(TSubclassOf<UC_GlyphBase> GlyphClass)
 {
 	UC_GlyphBase* NewGlyph = CreateGlyphInstance(GlyphClass);
-	if (!NewGlyph)return;
+	if (!NewGlyph)return nullptr;
 
 	//Mvp阶段只有8个刻印，暂不处理超出库存和重复获取的情况
 
 	GlyphInventory.Add((NewGlyph));
 	OnGlyphInventoryChange.Broadcast(true, NewGlyph->GlyphName);
+	return NewGlyph;
 }
 
 void UC_GlyphInventoryComponent::RemoveGlyph(UC_GlyphBase* TargetGlyph)
@@ -123,6 +124,12 @@ bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGamepla
 		VariantGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
 		RunningContext = VariantGlyph->PreProcessContext(SlotType,RunningContext);
 		VariantGlyph->PreActivate();
+		FString LogMsg = FString::Printf(TEXT("Base:%s Variant:%s"), *BaseGlyph->GlyphName.ToString(), *VariantGlyph->GlyphName.ToString());
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, LogMsg);
+	}
+	else {
+		FString LogMsg = FString::Printf(TEXT("Base:%s Variant:NULL"), *BaseGlyph->GlyphName.ToString());
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, LogMsg);
 	}
 
 	BaseGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
