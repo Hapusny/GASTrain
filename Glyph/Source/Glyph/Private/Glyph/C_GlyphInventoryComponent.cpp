@@ -22,7 +22,7 @@ UC_GlyphBase* UC_GlyphInventoryComponent::AddGlyph(TSubclassOf<UC_GlyphBase> Gly
 	UC_GlyphBase* NewGlyph = CreateGlyphInstance(GlyphClass);
 	if (!NewGlyph)return nullptr;
 
-	//Mvp½×¶ÎÖ»ÓĞ8¸ö¿ÌÓ¡£¬Ôİ²»´¦Àí³¬³ö¿â´æºÍÖØ¸´»ñÈ¡µÄÇé¿ö
+	//Mvpé˜¶æ®µåªæœ‰8ä¸ªåˆ»å°ï¼Œæš‚ä¸å¤„ç†è¶…å‡ºåº“å­˜å’Œé‡å¤è·å–çš„æƒ…å†µ
 
 	GlyphInventory.Add((NewGlyph));
 	OnGlyphInventoryChange.Broadcast(true, NewGlyph->GlyphName);
@@ -35,7 +35,7 @@ void UC_GlyphInventoryComponent::RemoveGlyph(UC_GlyphBase* TargetGlyph)
 
 	UnbindGlyph();
 
-	//½«Ô­²ÛÎ»ÖÃ¿Õ
+	//å°†åŸæ§½ä½ç½®ç©º
 	SlotContent(1,TargetGlyph->GlyphType);
 	OnGlyphTypeChange.Broadcast(EGlyphType::None, TargetGlyph->GlyphName, TargetGlyph->GlyphType);
 
@@ -59,7 +59,7 @@ void UC_GlyphInventoryComponent::SetGlyphType(UC_GlyphBase* TargetGlyph, EGlyphT
 		Content->GlyphType = TargetGlyph->GlyphType;
 	}
 	else {
-		//ContentÎªnullptrÊ±²»×ö½»»»£¬½ö½«Ô­²ÛÎ»ÖÃ¿Õ
+		//Contentä¸ºnullptræ—¶ä¸åšäº¤æ¢ï¼Œä»…å°†åŸæ§½ä½ç½®ç©º
 		SlotContent(1, TargetGlyph->GlyphType);
 		OnGlyphTypeChange.Broadcast(EGlyphType::None, TargetGlyph->GlyphName, TargetGlyph->GlyphType);
 	}
@@ -93,7 +93,7 @@ UC_GlyphBase* UC_GlyphInventoryComponent::NameToGlyph(FName Name)
 
 bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGameplayAbility* Ability)
 {
-	//»ñÈ¡¶ÔÓ¦²ÛÎ»¿ÌÓ¡
+	//è·å–å¯¹åº”æ§½ä½åˆ»å°
 	UC_GlyphBase* BaseGlyph = nullptr, *VariantGlyph = nullptr;
 	switch (SlotType)
 	{
@@ -119,25 +119,25 @@ bool UC_GlyphInventoryComponent::ActivateSlotGlyph(EGlyphType SlotType, UGamepla
 		return false;
 	}
 
-	//Ô¤´¦Àí
+	//é¢„å¤„ç†
 	if (VariantGlyph != nullptr) {
 		VariantGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
 		RunningContext = VariantGlyph->PreProcessContext(SlotType,RunningContext);
 		VariantGlyph->PreActivate();
-		FString LogMsg = FString::Printf(TEXT("Base:%s Variant:%s"), *BaseGlyph->GlyphName.ToString(), *VariantGlyph->GlyphName.ToString());
-		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, LogMsg);
+		/*FString LogMsg = FString::Printf(TEXT("Base:%s Variant:%s"), *BaseGlyph->GlyphName.ToString(), *VariantGlyph->GlyphName.ToString());
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, LogMsg);*/
 	}
-	else {
+	/*else {
 		FString LogMsg = FString::Printf(TEXT("Base:%s Variant:NULL"), *BaseGlyph->GlyphName.ToString());
 		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, LogMsg);
-	}
+	}*/
 
 	BaseGlyph->OwningAbility = MakeWeakObjectPtr<UGameplayAbility>(Ability);
 	BaseGlyph->RunningConfiguration = RunningContext;
 	BaseGlyph->PreActivate();
 
 
-	//ĞîÁ¦Êä³öÄ£Ê½´¦Àí
+	//è“„åŠ›è¾“å‡ºæ¨¡å¼å¤„ç†
 	if (RunningContext.ChargeContexts.IsEmpty())BaseGlyph->ActivateGlyph();
 	else {
 		if (!IsValid(GetWorld()))return false;
@@ -272,7 +272,7 @@ void UC_GlyphInventoryComponent::UnbindGlyph()
 
 void UC_GlyphInventoryComponent::PlayChargeMontage(UAnimMontage* Montage, float Rate)
 {
-	// »ñÈ¡½ÇÉ«ºÍ¶¯»­ÊµÀı
+	// è·å–è§’è‰²å’ŒåŠ¨ç”»å®ä¾‹
 	AC_BaseCharacter* Owner = Cast<AC_BaseCharacter>(GetOwner());
 	if (Owner && Owner->GetMesh())
 	{
@@ -295,12 +295,12 @@ void UC_GlyphInventoryComponent::SettleCharge(FGlyphConfigurationContext& Contex
 {
 	for (int i = 0; i < Context.ChargeContexts.Num(); i++) {
 		if (ChargeTime >= Context.ChargeContexts[i].ChargeTime) {
-			//Ö´ĞĞ¶ÔÓ¦ĞîÁ¦ĞŞÊÎ
+			//æ‰§è¡Œå¯¹åº”è“„åŠ›ä¿®é¥°
 			ApplyChargeRate(Context, i, 1.f);
 			ChargeTime -= Context.ChargeContexts[i].ChargeTime;
 		}
 		else {
-			//°´±ÈÂÊÖ´ĞĞĞŞÊÎ
+			//æŒ‰æ¯”ç‡æ‰§è¡Œä¿®é¥°
 			ApplyChargeRate(Context, i, ChargeTime / Context.ChargeContexts[i].ChargeTime);
 			break;
 		}

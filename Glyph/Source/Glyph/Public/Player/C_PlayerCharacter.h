@@ -7,6 +7,8 @@
 #include "C_PlayerCharacter.generated.h"
 
 class UC_UIComponent;
+class USpringArmComponent;
+class UCameraComponent;
 /**
  * 
  */
@@ -27,4 +29,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<UC_UIComponent>UIComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera");
+	TObjectPtr<USpringArmComponent> CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera");
+	TObjectPtr<UCameraComponent> FollowCamera;
 };

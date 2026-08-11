@@ -6,10 +6,21 @@
 #include "UI/C_UIComponent.h"
 #include "Glyph/C_GlyphInventoryComponent.h"
 #include "AbilitySystemComponent.h"
+#include "GameFramework/SpringArmComponent.h" 
+#include "Camera/CameraComponent.h"
 
 AC_PlayerCharacter::AC_PlayerCharacter()
 {
 	UIComponent = CreateDefaultSubobject<UC_UIComponent>("UIComponent");
+
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoom");
+	CameraBoom->SetupAttachment(GetRootComponent());
+	CameraBoom->TargetArmLength = 600.f;
+	CameraBoom->bUsePawnControlRotation = true;
+
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	FollowCamera->bUsePawnControlRotation = false;
 }
 
 UAbilitySystemComponent* AC_PlayerCharacter::GetAbilitySystemComponent() const

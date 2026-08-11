@@ -80,7 +80,7 @@ void AC_PlayerController::Menu()
 	UC_UIComponent* UIComponent = PlayerCharacter->UIComponent;
 	if (!IsValid(UIComponent))return;
 
-	//¿Ø¼þÏÔÊ¾ÖÐÔòÒþ²Ø£¬·´Ö®ÏÔÊ¾
+	//æŽ§ä»¶æ˜¾ç¤ºä¸­åˆ™éšè—ï¼Œåä¹‹æ˜¾ç¤º
 	if (UIComponent->GetWidgetState()) {
 		UIComponent->CloseWidget();
 		SetShowMouseCursor(false);
