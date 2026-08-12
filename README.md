@@ -345,7 +345,6 @@ void BP_Glyph_Fire::BaseEventReceived(EBaseEventType EventType, const FGlyphEven
 ## 相关文档
 
 - [游戏设计文档（GDD）](./GDD.docx) — 完整设计细节
-- [设计决策记录](./GDD.docx#8.2) — 架构决策与问题修复
 
 ---
 
