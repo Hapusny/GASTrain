@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
 #include "C_GlyphBase.generated.h"
 
 class UGameplayAbility;
@@ -59,71 +60,71 @@ struct FGlyphSpawnActorContext
 {
 	GENERATED_BODY()
 
-	//»ù´¡ÉËº¦ 
+	//åŸºç¡€ä¼¤å®³ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float Damage = 0.f;
 
-	//ÉËº¦ÊôĞÔ 
+	//ä¼¤å®³å±æ€§ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	EGlyphAttribute DamageAttribute = EGlyphAttribute::None;
 
-	//³ß´ç
+	//å°ºå¯¸
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	FVector Size = FVector(1.f, 1.f, 1.f);
 
-	//Ç°·½Æ«ÒÆ 
+	//å‰æ–¹åç§» 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float ForwardOffset = 0.f;
 
-	//ÉÏ·½Æ«ÒÆ 
+	//ä¸Šæ–¹åç§» 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float ElevationOffset = 0.f;
 
-	//ÊÇ·ñÖØĞ´Ğı×ª 
+	//æ˜¯å¦é‡å†™æ—‹è½¬ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	bool bOverrideRotation = false;
 
-	//Ğı×ª£¨µ± bOverrideRotation Îª true Ê±Ê¹ÓÃ£© 
+	//æ—‹è½¬ï¼ˆå½“ bOverrideRotation ä¸º true æ—¶ä½¿ç”¨ï¼‰ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	FQuat Rotation = FQuat::Identity;
 
-	//·¢ÉäËÙ¶È 
+	//å‘å°„é€Ÿåº¦ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float FireSpeed = 0.f;
 
-	//ÊÇ·ñ¿É´©Í¸ 
+	//æ˜¯å¦å¯ç©¿é€ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	bool bCanPenetrate = false;
 
-	//ÊÇ·ñÖØĞ´Ô­µã 
+	//æ˜¯å¦é‡å†™åŸç‚¹ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	bool bOverrideOrigin = false;
 
-	//Ô­µã£¨µ± bOverrideOrigin Îª true Ê±Ê¹ÓÃ£© 
+	//åŸç‚¹ï¼ˆå½“ bOverrideOrigin ä¸º true æ—¶ä½¿ç”¨ï¼‰ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	FVector Origin = FVector::ZeroVector;
 
-	//Éú³ÉÎïÀàĞÍ 
+	//ç”Ÿæˆç‰©ç±»å‹ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	EGlyphSpawnActorType SpawnType = EGlyphSpawnActorType::None;
 
-	//Éú³ÉÊıÁ¿£¨É¢Éä/»·ÈÆÊ±ÓĞĞ§£©
+	//ç”Ÿæˆæ•°é‡ï¼ˆæ•£å°„/ç¯ç»•æ—¶æœ‰æ•ˆï¼‰
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	int32 Number = 1;
 
-	//Á¬ÉäÊ±³¤£¨Á¬ÉäÊ±ÓĞĞ§£©
+	//è¿å°„æ—¶é•¿ï¼ˆè¿å°„æ—¶æœ‰æ•ˆï¼‰
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float ContinuousTime = 0.f;
 
-	//É¢Éä½Ç¶È£¨É¢ÉäÊ±ÓĞĞ§£¬µ¥Î»£º¶È
+	//æ•£å°„è§’åº¦ï¼ˆæ•£å°„æ—¶æœ‰æ•ˆï¼Œå•ä½ï¼šåº¦
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float ScatteringAngle = 0.f;
 
-	//»·ÈÆ¾àÀë£¨»·ÈÆÊ±ÓĞĞ§£©
+	//ç¯ç»•è·ç¦»ï¼ˆç¯ç»•æ—¶æœ‰æ•ˆï¼‰
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float OrbitDistance = 100.f;
 
-	//»·ÈÆËÙ¶È£¨»·ÈÆÊ±ÓĞĞ§£¬µ¥Î»£º¶È£© 
+	//ç¯ç»•é€Ÿåº¦ï¼ˆç¯ç»•æ—¶æœ‰æ•ˆï¼Œå•ä½ï¼šåº¦ï¼‰ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|SpawnActor")
 	float OrbitAngleSpeed = 0.f;
 };
@@ -133,39 +134,39 @@ struct FGlyphChargeContext
 {
 	GENERATED_BODY()
 
-	//ĞîÁ¦Ê±¼ä£¨Ãë£©
+	//è“„åŠ›æ—¶é—´ï¼ˆç§’ï¼‰
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float ChargeTime = 0.f;
 
-	//ĞîÁ¦ÃÉÌ«Ææ 
+	//è“„åŠ›è’™å¤ªå¥‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	UAnimMontage* ChargeMontage = nullptr;
 
-	//ÉËº¦Ó°Ïì±¶ÂÊ 
+	//ä¼¤å®³å½±å“å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float DamageRate = 1.f;
 
-	//Åö×²³ß´çÓ°Ïì±¶ÂÊ 
+	//ç¢°æ’å°ºå¯¸å½±å“å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float CollisionSizeRate = 1.f;
 
-	//Éú³ÉÎïÉËº¦Ó°Ïì±¶ÂÊ 
+	//ç”Ÿæˆç‰©ä¼¤å®³å½±å“å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float SpawnActorDamageRate = 1.f;
 
-	//Éú³ÉÎï³ß´çÓ°Ïì±¶ÂÊ 
+	//ç”Ÿæˆç‰©å°ºå¯¸å½±å“å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float SpawnActorSizeRate = 1.f;
 
-	//Éú³ÉÎïËÙ¶ÈÓ°Ïì±¶ÂÊ 
+	//ç”Ÿæˆç‰©é€Ÿåº¦å½±å“å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float SpawnActorSpeedRate = 1.f;
 
-	//Ğ§¹û³ÖĞøÊ±¼äÓ°Ïì±¶ÂÊ 
+	//æ•ˆæœæŒç»­æ—¶é—´å½±å“å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float EffectTimeRate = 1.f;
 
-	//Î»ÒÆÏµÊıÓ°Ïì±¶ÂÊ 
+	//ä½ç§»ç³»æ•°å½±å“å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Charge")
 	float MoveFactorRate = 1.f;
 };
@@ -175,43 +176,43 @@ struct FGlyphConfigurationContext
 {
 	GENERATED_BODY()
 
-	//»ù´¡ÉËº¦
+	//åŸºç¡€ä¼¤å®³
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float Damage = 0.f;
 
-	//ÉËº¦ÊôĞÔ 
+	//ä¼¤å®³å±æ€§ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	EGlyphAttribute DamageAttribute = EGlyphAttribute::None;
 
-	//Åö×²³ß´ç 
+	//ç¢°æ’å°ºå¯¸ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	FVector CollisionSize = FVector::ZeroVector;
 
-	//Åö×²Ç°·½Æ«ÒÆ 
+	//ç¢°æ’å‰æ–¹åç§» 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float HitBoxForwardOffset = 0.f;
 
-	//Åö×²ÉÏ·½Æ«ÒÆ 
+	//ç¢°æ’ä¸Šæ–¹åç§» 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float HitBoxElevationOffset = 0.f;
 
-	//¶¯×÷ËÙÂÊ±¶ÂÊ 
+	//åŠ¨ä½œé€Ÿç‡å€ç‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float MontageRate = 1.f;
 
-	//Éú³ÉÎïÉÏÏÂÎÄ 
+	//ç”Ÿæˆç‰©ä¸Šä¸‹æ–‡ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	FGlyphSpawnActorContext SpawnActorContext;
 
-	//ĞîÁ¦ÉÏÏÂÎÄÊı×é£¨Ö§³Ö¶à¶ÎĞîÁ¦£© 
+	//è“„åŠ›ä¸Šä¸‹æ–‡æ•°ç»„ï¼ˆæ”¯æŒå¤šæ®µè“„åŠ›ï¼‰ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	TArray<FGlyphChargeContext> ChargeContexts;
 
-	//Ğ§¹û³ÖĞøÊ±¼ä 
+	//æ•ˆæœæŒç»­æ—¶é—´ 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float EffectTime = 0.f;
 
-	//Î»ÒÆÏµÊı 
+	//ä½ç§»ç³»æ•° 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float MoveFactor = 0.f;
 };
@@ -221,19 +222,19 @@ struct FGlyphEventContext
 {
 	GENERATED_BODY()
 
-	//±¾Î»¿ÌÓ¡ÒıÓÃ£¨ÓÃÓÚ»ñÈ¡¿ÌÓ¡ĞÅÏ¢¼°Ê¹ÓÃ¿ÌÓ¡º¯Êı£© 
+	//æœ¬ä½åˆ»å°å¼•ç”¨ï¼ˆç”¨äºè·å–åˆ»å°ä¿¡æ¯åŠä½¿ç”¨åˆ»å°å‡½æ•°ï¼‰ 
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
 	UC_GlyphBase* BaseGlyph = nullptr;
 
-	//ÊÂ¼ş·¢ÉúÎ»ÖÃ 
+	//äº‹ä»¶å‘ç”Ÿä½ç½® 
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
 	FVector EventLocation = FVector::ZeroVector;
 
-	//ÊÂ¼ş·¢Éú³¯Ïò 
+	//äº‹ä»¶å‘ç”Ÿæœå‘ 
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
 	FVector EventToward = FVector::ZeroVector;
 
-	//Åö×²Ä¿±ê
+	//ç¢°æ’ç›®æ ‡
 	UPROPERTY(BlueprintReadWrite, Category = "Glyph|Event")
 	AActor* HitActor;
 };
@@ -262,6 +263,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "C|Ability")
 	TWeakObjectPtr<UGameplayAbility>OwningAbility;
+
+	// æœ¬ä½æ ‡ç­¾ - ç”¨äºAIå†³ç­–å’Œè¡Œä¸ºæ ‘
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Glyph|Tags")
+	FGameplayTagContainer BaseTags;
 
 	//Glyph Configuration
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph|Attack")

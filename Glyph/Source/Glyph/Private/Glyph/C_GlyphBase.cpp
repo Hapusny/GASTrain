@@ -46,7 +46,7 @@ UAbilityTask_WaitGameplayEvent* UC_GlyphBase::CreateWaitGameplayEventTask(FGamep
 {
     if (!OwningAbility.IsValid() || !EventTag.IsValid())return nullptr;
 
-    // Ö±½Óµ÷ÓÃ¹¤³§º¯ÊıÉú³É£¬¼¤»î²¢·µ»Ø
+    // ç›´æ¥è°ƒç”¨å·¥å‚å‡½æ•°ç”Ÿæˆï¼Œæ¿€æ´»å¹¶è¿”å›
     UAbilityTask_WaitGameplayEvent* Task = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(OwningAbility.Get(), EventTag, OptionalExternalTarget, OnlyTriggerOnce, OnlyMatchExact);
     if(IsValid(Task))Task->ReadyForActivation();
     return Task;
@@ -56,7 +56,7 @@ UAbilityTask_PlayMontageAndWait* UC_GlyphBase::CreatePlayMontageAndWaitTask(FNam
 {
     if (!OwningAbility.IsValid())return nullptr;
 
-    // Ö±½Óµ÷ÓÃ¹¤³§º¯ÊıÉú³É£¬¼¤»î,°ó¶¨Ä¬ÈÏ½áÊøability²¢·µ»Ø
+    // ç›´æ¥è°ƒç”¨å·¥å‚å‡½æ•°ç”Ÿæˆï¼Œæ¿€æ´»,ç»‘å®šé»˜è®¤ç»“æŸabilityå¹¶è¿”å›
     UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(OwningAbility.Get(), TaskInstanceName, MontageToPlay, Rate, StartSection, bStopWhenAbilityEnds, AnimRootMotionTranslationScale, StartTimeSeconds, bAllowInterruptAfterBlendOut);
     if (IsValid(Task)) {
         Task->ReadyForActivation();
@@ -80,7 +80,7 @@ TArray<AActor*> UC_GlyphBase::SpawnActor(TSubclassOf<AC_GlyphSpawnActor> ActorCl
     AC_BaseCharacter* Owner = Cast<AC_BaseCharacter>(OwningAbility.Get()->GetAvatarActorFromActorInfo());
     if (!IsValid(Owner))return Actors;
 
-    //Éú³É
+    //ç”Ÿæˆ
     AC_GlyphSpawnActor* SpawnedActor;
 
     FTransform Transform;
@@ -203,7 +203,7 @@ TArray<AActor*> UC_GlyphBase::BoxCollisionOverlapCheck(AActor* AvatarActor, FVec
         FQuat Rotation = AvatarActor->GetActorRotation().Quaternion();
         FVector Extent = BoxSize;
 
-        // 8¸ö¶¥µã
+        // 8ä¸ªé¡¶ç‚¹
         FVector Corners[8];
         int32 Index = 0;
         for (int32 X = -1; X <= 1; X += 2) {
@@ -214,7 +214,7 @@ TArray<AActor*> UC_GlyphBase::BoxCollisionOverlapCheck(AActor* AvatarActor, FVec
             }
         }
 
-        // 12Ìõ±ßµÄË÷Òı
+        // 12æ¡è¾¹çš„ç´¢å¼•
         int32 Edges[12][2] = {{0,1}, {0,2}, {0,4},{1,3}, {1,5},{2,3}, {2,6},{3,7},{4,5}, {4,6},{5,7},{6,7}};
 
         for (const auto& Edge : Edges) {
@@ -283,7 +283,7 @@ float UC_GlyphBase::ApplyDamageToTarget(AActor* Target, float Damage, EGlyphAttr
     UAbilitySystemComponent* ASC = TargetCharacter->GetAbilitySystemComponent();
     if (!IsValid(ASC))return 0.f;
 
-    //ÉËº¦´¦Àí
+    //ä¼¤å®³å¤„ç†
     Damage = FMath::Max(0.f, Damage);
     if (IsValid(DamageEffect)) {
         FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
@@ -293,7 +293,7 @@ float UC_GlyphBase::ApplyDamageToTarget(AActor* Target, float Damage, EGlyphAttr
 
         UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, CTags::Datas::Damage, Damage);
 
-        //½«Ã¶¾Ù×ªÎª¶ÔÓ¦µÄÔªËØTag
+        //å°†æšä¸¾è½¬ä¸ºå¯¹åº”çš„å…ƒç´ Tag
         FGameplayTag ElementTag;
         switch (Attribute)
         {
@@ -312,7 +312,7 @@ float UC_GlyphBase::ApplyDamageToTarget(AActor* Target, float Damage, EGlyphAttr
         ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
     }
 
-    //ÃüÖĞÊÂ¼ş
+    //å‘½ä¸­äº‹ä»¶
     FGameplayEventData Payload;
     Payload.Instigator = OwningAbility->GetAvatarActorFromActorInfo();
     Payload.Target = TargetCharacter;
