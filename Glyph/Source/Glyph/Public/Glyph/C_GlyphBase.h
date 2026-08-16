@@ -176,6 +176,10 @@ struct FGlyphConfigurationContext
 {
 	GENERATED_BODY()
 
+	//基础冷却
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
+	float Cooldown = 0.f;
+
 	//基础伤害
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float Damage = 0.f;
@@ -334,6 +338,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "C|Glyph")
 	void TryEndAbility();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Glyph")
+	void ApplyCooldown(EGlyphType BaseGlyphType);
 
 private:
 	void InitializeActorByContext(AC_GlyphSpawnActor* Actor,const FGlyphSpawnActorContext& Context);
