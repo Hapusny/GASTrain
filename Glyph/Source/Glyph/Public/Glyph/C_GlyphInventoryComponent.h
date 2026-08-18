@@ -47,6 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
 	void EndRunningCharge();
 
+	UFUNCTION(BlueprintCallable, Category = "C|GlyphInventory")
+	UC_GlyphBase* GetSlotContent(EGlyphType Type);
+
 protected:
 	UC_GlyphBase* CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass);
 
@@ -62,7 +65,7 @@ private:
 
 	TArray<TWeakObjectPtr<UC_GlyphBase>>MoveSlot;
 
-	//²Ù×÷0Îª²éÑ¯¶ÔÓ¦ÀàĞÍ²ÛÎ»ÄÚÈİ£»²Ù×÷1ÎªÇå¿Õ¶ÔÓ¦²ÛÎ»£¬·µ»ØÔ­ÏÈÄÚÈİ£»²Ù×÷2Îª½«²ÛÎ»ÖÃÎªÄ¿±ê¿ÌÓ¡£¬·µ»ØÔ­ÏÈÄÚÈİ
+	//æ“ä½œ0ä¸ºæŸ¥è¯¢å¯¹åº”ç±»å‹æ§½ä½å†…å®¹ï¼›æ“ä½œ1ä¸ºæ¸…ç©ºå¯¹åº”æ§½ä½ï¼Œè¿”å›åŸå…ˆå†…å®¹ï¼›æ“ä½œ2ä¸ºå°†æ§½ä½ç½®ä¸ºç›®æ ‡åˆ»å°ï¼Œè¿”å›åŸå…ˆå†…å®¹
 	UC_GlyphBase* SlotContent(int Operation,EGlyphType Type, UC_GlyphBase* TargetGlyph = nullptr);
 
 	void BindGlyph();

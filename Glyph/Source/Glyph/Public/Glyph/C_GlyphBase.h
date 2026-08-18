@@ -219,6 +219,10 @@ struct FGlyphConfigurationContext
 	//位移系数 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Glyph|Config")
 	float MoveFactor = 0.f;
+
+	// 本位标签 - 用于AI决策和行为树
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Glyph|Config|Tags")
+	FGameplayTagContainer BaseTags;
 };
 
 USTRUCT(BlueprintType)
@@ -267,10 +271,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "C|Ability")
 	TWeakObjectPtr<UGameplayAbility>OwningAbility;
-
-	// 本位标签 - 用于AI决策和行为树
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Glyph|Tags")
-	FGameplayTagContainer BaseTags;
 
 	//Glyph Configuration
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Glyph|Attack")

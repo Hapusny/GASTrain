@@ -167,6 +167,11 @@ void UC_GlyphInventoryComponent::EndRunningCharge()
 	}
 }
 
+UC_GlyphBase* UC_GlyphInventoryComponent::GetSlotContent(EGlyphType Type)
+{
+	return SlotContent(0,Type);
+}
+
 UC_GlyphBase* UC_GlyphInventoryComponent::CreateGlyphInstance(TSubclassOf<UC_GlyphBase> GlyphClass)
 {
 	if (!GlyphClass)return nullptr;
