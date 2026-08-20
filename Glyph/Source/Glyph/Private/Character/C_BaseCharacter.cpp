@@ -24,6 +24,10 @@ UAttributeSet* AC_BaseCharacter::GetAttributeSet() const
 	return nullptr;
 }
 
+void AC_BaseCharacter::HandleDeath()
+{
+}
+
 void AC_BaseCharacter::GiveStartupAbilities()
 {
 	if (!IsValid(GetAbilitySystemComponent()))return;

@@ -24,9 +24,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C|Enemy|Glyph")
 	TMap<TSubclassOf<UC_GlyphBase>,float>GlyphPool;
 
-	//ÆÕ¹¥±¾Î»¡¢¼¼ÄÜ±¾Î»¡¢Î»ÒÆ±¾Î»¡¢ÆÕ¹¥±äÎ»¡¢¼¼ÄÜ±äÎ»¡¢Î»ÒÆ±äÎ»·Ö±ğ¶ÔÓ¦6¸öµÈ¼¶½âËøµÄ²ÛÎ»
+	//æ™®æ”»æœ¬ä½ã€æŠ€èƒ½æœ¬ä½ã€ä½ç§»æœ¬ä½ã€æ™®æ”»å˜ä½ã€æŠ€èƒ½å˜ä½ã€ä½ç§»å˜ä½åˆ†åˆ«å¯¹åº”6ä¸ªç­‰çº§è§£é”çš„æ§½ä½
 	UFUNCTION(BlueprintCallable, Category = "C|Enemy|Glyph")
 	void GiveGlyph(int32 Level);
+
+	virtual void HandleDeath()override;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Enemy|Death")
+	void BP_HandleDeath();
 
 protected:
 	virtual void BeginPlay()override;
@@ -39,11 +44,11 @@ private:
 	TObjectPtr<UAttributeSet> AttributeSet;
 
 	/*
-	 ´ÓÈ¨ÖØ³ØÖĞÒ»´ÎĞÔ³éÈ¡ N ¸ö²»Í¬µÄ¿ÌÓ¡£¨ÎŞ·Å»Ø£©
-	 GlyphPool        È¨ÖØ³Ø
-	 Count            ĞèÒª³éÈ¡µÄÊıÁ¿
-	 bAllowFallback   Èç¹û³Ø×Ó²»¹»´ó£¬ÊÇ·ñÔÊĞí·µ»Ø²¿·Ö½á¹û£¨falseÔò·µ»Ø¿ÕÊı×é£©
-	 return           ³éÈ¡µ½µÄ¿ÌÓ¡ÀàÊı×é
+	 ä»æƒé‡æ± ä¸­ä¸€æ¬¡æ€§æŠ½å– N ä¸ªä¸åŒçš„åˆ»å°ï¼ˆæ— æ”¾å›ï¼‰
+	 GlyphPool        æƒé‡æ± 
+	 Count            éœ€è¦æŠ½å–çš„æ•°é‡
+	 bAllowFallback   å¦‚æœæ± å­ä¸å¤Ÿå¤§ï¼Œæ˜¯å¦å…è®¸è¿”å›éƒ¨åˆ†ç»“æœï¼ˆfalseåˆ™è¿”å›ç©ºæ•°ç»„ï¼‰
+	 return           æŠ½å–åˆ°çš„åˆ»å°ç±»æ•°ç»„
 	 */
 	static TArray<TSubclassOf<UC_GlyphBase>> GetMultipleRandomWeightedGlyphs(TMap<TSubclassOf<UC_GlyphBase>, float> Pool,int32 Count,bool bAllowFallback = true);
 };

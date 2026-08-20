@@ -36,6 +36,12 @@ void AC_EnemyCharacter::GiveGlyph(int32 Level)
     }
 }
 
+void AC_EnemyCharacter::HandleDeath()
+{
+    GlyphInventoryComponent->RemoveAllGlyph();
+    BP_HandleDeath();
+}
+
 void AC_EnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -56,13 +62,13 @@ TArray<TSubclassOf<UC_GlyphBase>> AC_EnemyCharacter::GetMultipleRandomWeightedGl
 
     for (int32 i = 0; i < ActualCount; i++)
     {
-        // ¼ÆËãµ±Ç°³Ø×ÓµÄ×ÜÈ¨ÖØ
+        // è®¡ç®—å½“å‰æ± å­çš„æ€»æƒé‡
         float TotalWeight = 0.0f;
         for (const auto& Pair : Pool)TotalWeight += Pair.Value;
 
         if (TotalWeight <= 0.0f)break;
 
-        // ¼ÓÈ¨Ëæ»úÑ¡Ôñ
+        // åŠ æƒéšæœºé€‰æ‹©
         float RandomValue = FMath::FRandRange(0.0f, TotalWeight);
         float AccumulatedWeight = 0.0f;
         TSubclassOf<UC_GlyphBase> SelectedClass = nullptr;

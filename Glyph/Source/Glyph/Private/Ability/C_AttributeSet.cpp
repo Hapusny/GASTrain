@@ -13,7 +13,7 @@ void UC_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
-		// 1. ¶ÁÈ¡Ô­Ê¼ÉËº¦Öµ
+		// 1. è¯»å–åŸå§‹ä¼¤å®³å€¼
 		float RawDamage = GetIncomingDamage();
 
 		SetIncomingDamage(0.f);
@@ -23,21 +23,28 @@ void UC_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 		float FinalDamage = CalculateFinalDamage(Data, RawDamage);
 		if (FinalDamage <= 0.f) return;
 
-		// Ó¦ÓÃ×îÖÕÉËº¦µ½ Health
+		// åº”ç”¨æœ€ç»ˆä¼¤å®³åˆ° Health
 		float OldHealth = GetHealth();
 		float NewHealth = OldHealth - FinalDamage;
 		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
-		// ËÀÍöÅĞ¶¨
+		// æ­»äº¡åˆ¤å®š
 		if (GetHealth() <= 0.f)
 		{
-			// »ñÈ¡ÉËº¦À´Ô´
+			// è·å–ä¼¤å®³æ¥æº
 			AActor* Instigator = Data.EffectSpec.GetContext().GetInstigator();
 
-			// ÌáÈ¡ÉËº¦À´Ô´Glyph
+			// æå–ä¼¤å®³æ¥æºGlyph
 			UC_GlyphBase* SourceGlyph = Cast<UC_GlyphBase>(Data.EffectSpec.GetContext().GetSourceObject());
 
-			// µ÷ÓÃËÀÍö´¦Àíº¯Êı
+			// è°ƒç”¨æ­»äº¡å¤„ç†å‡½æ•°
+			UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent();
+			if (IsValid(ASC)) {
+				AC_BaseCharacter* SelfCharacter = Cast<AC_BaseCharacter>(ASC->GetAvatarActor());
+				if (IsValid(SelfCharacter)) {
+					SelfCharacter->HandleDeath();
+				}
+			}
 		}
 	}
 }
@@ -48,12 +55,12 @@ void UC_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, fl
 
 	if (Attribute == GetHealthAttribute())
 	{
-		// ÑªÁ¿ÏŞÖÆÔÚ [0, MaxHealth] Çø¼ä
+		// è¡€é‡é™åˆ¶åœ¨ [0, MaxHealth] åŒºé—´
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
 	}
 	else if (Attribute == GetMaxHealthAttribute())
 	{
-		// ×î´óÑªÁ¿²»ÄÜµÍÓÚ1
+		// æœ€å¤§è¡€é‡ä¸èƒ½ä½äº1
 		NewValue = FMath::Max(NewValue, 1.f);
 	}
 	else if (Attribute == GetFireResistanceAttribute()
@@ -61,7 +68,7 @@ void UC_AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, fl
 		|| Attribute == GetWindResistanceAttribute()
 		|| Attribute == GetSoilResistanceAttribute())
 	{
-		// ¿¹ĞÔÏŞÖÆÔÚ [0, 1] Çø¼ä
+		// æŠ—æ€§é™åˆ¶åœ¨ [0, 1] åŒºé—´
 		NewValue = FMath::Clamp(NewValue, 0.f, 1.f);
 	}
 }
@@ -70,7 +77,7 @@ float UC_AttributeSet::CalculateFinalDamage(const FGameplayEffectModCallbackData
 {
 	if (RawDamage <= 0.f) return 0.f;
 
-	//»ñÈ¡ÔªËØ
+	//è·å–å…ƒç´ 
 	FGameplayTagContainer AllAssetTags;
 	Data.EffectSpec.GetAllAssetTags(AllAssetTags);
 
@@ -84,7 +91,7 @@ float UC_AttributeSet::CalculateFinalDamage(const FGameplayEffectModCallbackData
 		}
 	}
 
-	//¸ù¾İÔªËØÀàĞÍÓ¦ÓÃ¿¹ĞÔ
+	//æ ¹æ®å…ƒç´ ç±»å‹åº”ç”¨æŠ—æ€§
 	float Resistance = 0.f;
 	if (ElementType == CTags::Datas::Elements::Fire)
 	{
@@ -105,7 +112,7 @@ float UC_AttributeSet::CalculateFinalDamage(const FGameplayEffectModCallbackData
 
 	float FinalDamage = RawDamage * (1.f - Resistance);
 
-	// ¼ì²âTag
+	// æ£€æµ‹Tag
 	UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent();
 	if (ASC && ASC->HasMatchingGameplayTag(CTags::States::Buffs::Block))
 	{

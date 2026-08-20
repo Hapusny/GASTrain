@@ -42,7 +42,8 @@ void UC_GlyphInventoryComponent::RemoveGlyph(UC_GlyphBase* TargetGlyph)
 	BindGlyph();
 
 	if (GlyphInventory.RemoveSingle(TargetGlyph)) {
-		OnGlyphInventoryChange.Broadcast(false, TargetGlyph->GlyphName);
+		if(IsValid(TargetGlyph))OnGlyphInventoryChange.Broadcast(false, TargetGlyph->GlyphName);
+		if (IsValid(TargetGlyph))TargetGlyph->MarkAsGarbage();
 	}
 }
 
@@ -72,14 +73,10 @@ void UC_GlyphInventoryComponent::SetGlyphType(UC_GlyphBase* TargetGlyph, EGlyphT
 
 void UC_GlyphInventoryComponent::RemoveAllGlyph()
 {
-	UnbindGlyph();
-
 	for (UC_GlyphBase* Glyph : GlyphInventory){
 		OnGlyphInventoryChange.Broadcast(false, Glyph->GlyphName);
 		if (Glyph->GlyphType != EGlyphType::None)SlotContent(1,Glyph->GlyphType);
 	}
-
-	BindGlyph();
 	GlyphInventory.Empty();
 }
 

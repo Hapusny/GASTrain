@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "C|Ability")
 	TArray<TSubclassOf<UGameplayAbility>>StartupAbilities;
 
+	virtual void HandleDeath();
+
 protected:
 	void GiveStartupAbilities();
 
