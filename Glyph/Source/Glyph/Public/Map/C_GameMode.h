@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "C_GameMode.generated.h"
 
+class AC_EnemyCharacter;
+
 /**
  * 
  */
@@ -14,4 +16,7 @@ class GLYPH_API AC_GameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+
+public:
+	AC_EnemyCharacter* SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass,FVector Location, TArray<float>Values);
 };
