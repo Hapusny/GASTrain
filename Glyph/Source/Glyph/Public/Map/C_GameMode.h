@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "C_Pheromone.h"
 #include "C_GameMode.generated.h"
 
 class AC_EnemyCharacter;
@@ -18,5 +19,12 @@ class GLYPH_API AC_GameMode : public AGameModeBase
 	
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "C|GameMode")
 	AC_EnemyCharacter* SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass,FVector Location, TArray<float>Values);
+
+	UPROPERTY(EditDefaultsOnly, Category = "C|GameMode")
+	TSubclassOf<AC_Pheromone> PheromoneClass;
+
+	UFUNCTION(BlueprintCallable, Category = "C|GameMode")
+	void SpawnPheromone(FVector Location);
 };

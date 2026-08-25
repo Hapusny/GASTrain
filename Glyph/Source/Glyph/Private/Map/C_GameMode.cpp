@@ -3,6 +3,7 @@
 
 #include "Map/C_GameMode.h"
 #include "Enemy//C_EnemyCharacter.h"
+#include "Map/C_GameState.h"
 
 AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass, FVector Location, TArray<float> Values)
 {
@@ -40,4 +41,16 @@ AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorC
     // 保底返回最后一个（浮点误差兜底）
     Actor->GiveGlyph(Values.Num());
     return Actor;
+}
+
+void AC_GameMode::SpawnPheromone(FVector Location)
+{
+    UWorld* World = GetWorld();
+    if (!IsValid(World))return;
+    if (!IsValid(PheromoneClass))return;
+    AC_Pheromone* Pheromone = World->SpawnActor<AC_Pheromone>(PheromoneClass, Location, FRotator(0.f, 0.f, 0.f));
+    if (!IsValid(Pheromone))return;
+    AC_GameState* GS = Cast<AC_GameState>(World->GetGameState());
+    if (!IsValid(GS))return;
+	GS->AddPheromone(Pheromone);
 }

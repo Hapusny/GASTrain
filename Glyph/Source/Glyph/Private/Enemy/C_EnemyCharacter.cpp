@@ -5,6 +5,7 @@
 #include "Ability/C_AttributeSet.h"
 #include "AbilitySystemComponent.h"
 #include "Glyph/C_GlyphInventoryComponent.h"
+#include "Map/C_GameMode.h"
 
 AC_EnemyCharacter::AC_EnemyCharacter()
 {
@@ -39,6 +40,8 @@ void AC_EnemyCharacter::GiveGlyph(int32 Level)
 void AC_EnemyCharacter::HandleDeath()
 {
     GlyphInventoryComponent->RemoveAllGlyph();
+	AC_GameMode* GM = Cast<AC_GameMode>(GetWorld()->GetAuthGameMode());
+    if (IsValid(GM))GM->SpawnPheromone(GetActorLocation());
     BP_HandleDeath();
 }
 

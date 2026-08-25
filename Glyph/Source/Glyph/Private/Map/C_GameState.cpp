@@ -32,6 +32,5 @@ TArray<AC_Pheromone*> AC_GameState::FindPheromonesNear(FVector Location, float R
             Result.Add(Pheromone);
         }
     }
-
     return Result;
 }
