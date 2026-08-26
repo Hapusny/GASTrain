@@ -19,12 +19,26 @@ class GLYPH_API AC_GameMode : public AGameModeBase
 	
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "C|GameMode")
+	virtual void BeginPlay()override;
+
+	UFUNCTION(BlueprintCallable, Category = "C|GameMode|Enemy")
 	AC_EnemyCharacter* SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass,FVector Location, TArray<float>Values);
 
-	UPROPERTY(EditDefaultsOnly, Category = "C|GameMode")
+	UPROPERTY(EditDefaultsOnly, Category = "C|GameMode|Pheromone")
 	TSubclassOf<AC_Pheromone> PheromoneClass;
 
-	UFUNCTION(BlueprintCallable, Category = "C|GameMode")
+	UFUNCTION(BlueprintCallable, Category = "C|GameMode|Pheromone")
 	void SpawnPheromone(FVector Location);
+
+	UFUNCTION(BlueprintCallable, Category = "C|GameMode|Enemy")
+	int32 GetEnemyCount()const { return Enemys.Num(); }
+
+	UFUNCTION(BlueprintCallable, Category = "C|GameMode|Enemy")
+	void RemoveEnemy(AC_EnemyCharacter* Enemy);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|GameMode|Enemy")
+	void BP_WaveFinished();
+
+private:
+	TArray<TWeakObjectPtr<AC_EnemyCharacter>>Enemys;
 };

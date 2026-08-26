@@ -41,8 +41,12 @@ void AC_EnemyCharacter::HandleDeath()
 {
     GlyphInventoryComponent->RemoveAllGlyph();
 	AC_GameMode* GM = Cast<AC_GameMode>(GetWorld()->GetAuthGameMode());
-    if (IsValid(GM))GM->SpawnPheromone(GetActorLocation());
+    if (IsValid(GM)) {
+        GM->SpawnPheromone(GetActorLocation());
+        GM->RemoveEnemy(this);
+    }
     BP_HandleDeath();
+    Destroy();
 }
 
 void AC_EnemyCharacter::BeginPlay()

@@ -5,6 +5,12 @@
 #include "Enemy//C_EnemyCharacter.h"
 #include "Map/C_GameState.h"
 
+void AC_GameMode::BeginPlay()
+{
+    Super::BeginPlay();
+
+}
+
 AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass, FVector Location, TArray<float> Values)
 {
     UWorld* World = GetWorld();
@@ -18,10 +24,7 @@ AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorC
 
     // 1. 计算总权重
     float TotalWeight = 0.0f;
-    for (float Weight : Values)
-    {
-        TotalWeight += Weight;
-    }
+    for (float Weight : Values)TotalWeight += Weight;
 
     // 2. 生成随机数 [0, TotalWeight)
     float RandomValue = FMath::FRandRange(0.0f, TotalWeight);
@@ -40,6 +43,8 @@ AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorC
 
     // 保底返回最后一个（浮点误差兜底）
     Actor->GiveGlyph(Values.Num());
+
+	Enemys.Add(MakeWeakObjectPtr(Actor));
     return Actor;
 }
 
@@ -53,4 +58,11 @@ void AC_GameMode::SpawnPheromone(FVector Location)
     AC_GameState* GS = Cast<AC_GameState>(World->GetGameState());
     if (!IsValid(GS))return;
 	GS->AddPheromone(Pheromone);
+}
+
+void AC_GameMode::RemoveEnemy(AC_EnemyCharacter* Enemy)
+{
+    if (!IsValid(Enemy))return;
+	Enemys.Remove(Enemy);
+    if (GetEnemyCount() == 0)BP_WaveFinished();
 }
