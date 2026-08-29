@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "C_Pheromone.generated.h"
 
+class UC_GlyphBase;
+
 UCLASS()
 class GLYPH_API AC_Pheromone : public AActor
 {
@@ -17,4 +19,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C|Actor")
 	float Radius = 200.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "C|Glyph")
+	TSubclassOf<UC_GlyphBase> MarkedGlyphClass = nullptr;
 };

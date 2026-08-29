@@ -41,8 +41,8 @@ void UC_AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
 			UAbilitySystemComponent* ASC = GetOwningAbilitySystemComponent();
 			if (IsValid(ASC)) {
 				AC_BaseCharacter* SelfCharacter = Cast<AC_BaseCharacter>(ASC->GetAvatarActor());
-				if (IsValid(SelfCharacter)) {
-					SelfCharacter->HandleDeath();
+				if (IsValid(SelfCharacter) && IsValid(SourceGlyph)){
+					SelfCharacter->HandleDeath(SourceGlyph->GetClass());
 				}
 			}
 		}

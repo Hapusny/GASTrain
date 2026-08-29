@@ -21,17 +21,14 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent()const override;
 	virtual UAttributeSet* GetAttributeSet()const override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C|Enemy|Glyph")
-	TMap<TSubclassOf<UC_GlyphBase>,float>GlyphPool;
-
 	//普攻本位、技能本位、位移本位、普攻变位、技能变位、位移变位分别对应6个等级解锁的槽位
 	UFUNCTION(BlueprintCallable, Category = "C|Enemy|Glyph")
-	void GiveGlyph(int32 Level);
+	void GiveGlyph(int32 Level, TMap<TSubclassOf<UC_GlyphBase>, float>GlyphPool);
 
-	virtual void HandleDeath()override;
+	virtual void HandleDeath(UClass* MarkedGlyphClass)override;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Enemy|Death")
-	void BP_HandleDeath();
+	void BP_HandleDeath(UClass* MarkedGlyphClass);
 
 protected:
 	virtual void BeginPlay()override;

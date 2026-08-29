@@ -20,6 +20,7 @@ public:
 
 	void RemovePheromone(AC_Pheromone* Pheromone);
 
+	UFUNCTION(BlueprintCallable, Category = "C|Pheromone")
 	TArray<AC_Pheromone*> FindPheromonesNear(FVector Location, float Radius);
 
 private:

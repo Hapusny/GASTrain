@@ -25,7 +25,7 @@ UAttributeSet* AC_EnemyCharacter::GetAttributeSet() const
 	return AttributeSet;
 }
 
-void AC_EnemyCharacter::GiveGlyph(int32 Level)
+void AC_EnemyCharacter::GiveGlyph(int32 Level,TMap<TSubclassOf<UC_GlyphBase>, float>GlyphPool)
 {
     TArray<TSubclassOf<UC_GlyphBase>> SelectedGlyphs = GetMultipleRandomWeightedGlyphs(GlyphPool, Level);
     EGlyphType SlotTypes[] = {EGlyphType::AttackBase, EGlyphType::SkillBase,EGlyphType::MoveBase, EGlyphType::AttackVariant,EGlyphType::SkillVariant,EGlyphType::MoveVariant};
@@ -37,15 +37,15 @@ void AC_EnemyCharacter::GiveGlyph(int32 Level)
     }
 }
 
-void AC_EnemyCharacter::HandleDeath()
+void AC_EnemyCharacter::HandleDeath(UClass* MarkedGlyphClass)
 {
     GlyphInventoryComponent->RemoveAllGlyph();
 	AC_GameMode* GM = Cast<AC_GameMode>(GetWorld()->GetAuthGameMode());
     if (IsValid(GM)) {
-        GM->SpawnPheromone(GetActorLocation());
+        GM->SpawnPheromone(GetActorLocation(), MarkedGlyphClass);
         GM->RemoveEnemy(this);
     }
-    BP_HandleDeath();
+    BP_HandleDeath(MarkedGlyphClass);
     Destroy();
 }
 

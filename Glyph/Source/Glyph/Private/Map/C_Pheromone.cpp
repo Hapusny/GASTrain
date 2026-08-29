@@ -2,6 +2,7 @@
 
 
 #include "Map/C_Pheromone.h"
+#include "Glyph/C_GlyphBase.h"
 
 // Sets default values
 AC_Pheromone::AC_Pheromone()

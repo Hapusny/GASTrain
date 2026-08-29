@@ -11,7 +11,7 @@ void AC_GameMode::BeginPlay()
 
 }
 
-AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass, FVector Location, TArray<float> Values)
+AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass, FVector Location, TArray<float> Values, TMap<TSubclassOf<UC_GlyphBase>, float>GlyphPool)
 {
     UWorld* World = GetWorld();
     AC_EnemyCharacter* Actor = nullptr;
@@ -36,25 +36,26 @@ AC_EnemyCharacter* AC_GameMode::SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorC
         Cumulative += Values[i];
         if (RandomValue < Cumulative)
         {
-            Actor->GiveGlyph(i + 1);
+            Actor->GiveGlyph(i + 1, GlyphPool);
             return Actor;
         }
     }
 
     // 保底返回最后一个（浮点误差兜底）
-    Actor->GiveGlyph(Values.Num());
+    Actor->GiveGlyph(Values.Num(), GlyphPool);
 
 	Enemys.Add(MakeWeakObjectPtr(Actor));
     return Actor;
 }
 
-void AC_GameMode::SpawnPheromone(FVector Location)
+void AC_GameMode::SpawnPheromone(FVector Location, UClass* MarkedGlyphClass)
 {
     UWorld* World = GetWorld();
     if (!IsValid(World))return;
     if (!IsValid(PheromoneClass))return;
     AC_Pheromone* Pheromone = World->SpawnActor<AC_Pheromone>(PheromoneClass, Location, FRotator(0.f, 0.f, 0.f));
     if (!IsValid(Pheromone))return;
+	Pheromone->MarkedGlyphClass = MarkedGlyphClass;
     AC_GameState* GS = Cast<AC_GameState>(World->GetGameState());
     if (!IsValid(GS))return;
 	GS->AddPheromone(Pheromone);

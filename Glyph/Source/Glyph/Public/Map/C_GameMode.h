@@ -22,13 +22,13 @@ public:
 	virtual void BeginPlay()override;
 
 	UFUNCTION(BlueprintCallable, Category = "C|GameMode|Enemy")
-	AC_EnemyCharacter* SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass,FVector Location, TArray<float>Values);
+	AC_EnemyCharacter* SpawnEnemy(TSubclassOf<AC_EnemyCharacter> ActorClass,FVector Location, TArray<float>Values, TMap<TSubclassOf<UC_GlyphBase>, float>GlyphPool);
 
 	UPROPERTY(EditDefaultsOnly, Category = "C|GameMode|Pheromone")
 	TSubclassOf<AC_Pheromone> PheromoneClass;
 
 	UFUNCTION(BlueprintCallable, Category = "C|GameMode|Pheromone")
-	void SpawnPheromone(FVector Location);
+	void SpawnPheromone(FVector Location, UClass* MarkedGlyphClass);
 
 	UFUNCTION(BlueprintCallable, Category = "C|GameMode|Enemy")
 	int32 GetEnemyCount()const { return Enemys.Num(); }
