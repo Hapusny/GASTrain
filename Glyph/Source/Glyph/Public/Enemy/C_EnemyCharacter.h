@@ -25,6 +25,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C|Enemy|Glyph")
 	void GiveGlyph(int32 Level, TMap<TSubclassOf<UC_GlyphBase>, float>GlyphPool);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "C|Enemy|Init")
+	void BP_BeginInit(int32 Level);
+
 	virtual void HandleDeath(UClass* MarkedGlyphClass)override;
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "C|Enemy|Death")

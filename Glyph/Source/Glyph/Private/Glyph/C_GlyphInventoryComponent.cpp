@@ -166,6 +166,7 @@ void UC_GlyphInventoryComponent::EndRunningCharge()
 
 UC_GlyphBase* UC_GlyphInventoryComponent::GetSlotContent(EGlyphType Type)
 {
+	if(SlotContent(0, Type) == nullptr)GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Green, FString::Printf(TEXT("111")));
 	return SlotContent(0,Type);
 }
 

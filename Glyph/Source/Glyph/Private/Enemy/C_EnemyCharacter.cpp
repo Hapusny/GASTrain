@@ -35,6 +35,8 @@ void AC_EnemyCharacter::GiveGlyph(int32 Level,TMap<TSubclassOf<UC_GlyphBase>, fl
         UC_GlyphBase* Glyph = GlyphInventoryComponent->AddGlyph(SelectedGlyphs[i]);
         if (Glyph)GlyphInventoryComponent->SetGlyphType(Glyph, SlotTypes[i]);
     }
+
+	BP_BeginInit(Level);
 }
 
 void AC_EnemyCharacter::HandleDeath(UClass* MarkedGlyphClass)
