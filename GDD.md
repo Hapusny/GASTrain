@@ -180,7 +180,7 @@
 
 刻印是构筑的基础单元。每枚刻印是一个独立的蓝图类，同时包含本位和变位两套行为逻辑。本位（Base）是技能的核心行为骨架，界定"做什么"，在关键生命周期节点发出事件。每枚刻印为三个功能槽（普攻/技能/位移）各设计一套本位逻辑，分别对应不同的释放方式和数值强度。变位（Variant）是技能的修饰行为模块，接收本位发出的事件，检测触发条件后执行响应逻辑。
 
-刻印由"随机语法 + 随机词条"组成：语法决定本位与变位的行为范式，词条为数值附魔（详见 2.3.5）。
+刻印由"语法 + 随机词条"组成：语法决定本位与变位的行为范式，词条为数值附魔（详见 2.3.5）。
 
 变位对本位的影响遵循三层优先级：
 
@@ -196,7 +196,7 @@
 
 #### 2.3.2. 槽位架构
 
-每个角色拥有三个功能槽，每个功能槽由两个位置组成。槽位一放置的刻印表现本位效果，槽位二放置的刻印表现变位效果。若某位置为空，则使用默认基础能力（普攻为近战挥击，技能为空，位移为翻滚）。
+角色拥有三个功能槽，每个功能槽由两个位置组成。槽位一放置的刻印表现本位效果，槽位二放置的刻印表现变位效果。若某位置为空，则使用默认基础能力（普攻为近战挥击，技能为空，位移为翻滚）。
 
 三个功能槽各自承担不同的战斗职能。普攻槽为基础输出循环，伤害较低、冷却短或无冷却。技能槽为高收益爆发技能，伤害高、冷却长，可能附带额外效果。位移槽为生存或机动技能，以位移为主体，可能附带伤害或效果。位移槽决定基础移动方式。
 
@@ -212,7 +212,7 @@
 
 **获取刻印**：击杀小怪有概率爆出刻印，刻印由随机语法与随机词条组成。库满时获取新刻印须永久舍弃一枚现存刻印。
 
-**重复获取（整枚二选一）**：重复获取同一刻印不触发升级，而是触发整枚二选一——保留旧刻印（当前等级与旧词条）或换新刻印（一级与新词条）。被放弃的刻印转化为残响录入图鉴。
+**重复获取（整枚二选一）**：重复获取同一刻印不触发升级，而是触发整枚二选一——保留旧刻印（当前等级与旧词条）或换新刻印（新获取刻印的等级与新词条）。被放弃的刻印转化为残响录入图鉴。
 
 **等级晋升**：等级晋升只能通过顿悟，上限三级。刻印等级只影响技能倍率与表现，不改变词条。
 
@@ -712,28 +712,28 @@ Content/
 ### 9.2. 设计决策记录
 
 #### 9.2.1. 刻印设计
-刻印本位与变位写在同一蓝图，独立设计不复用整枚逻辑，只复用工具函数，保证每枚刻印的独特性与可维护性。
+每枚刻印为一个独立的蓝图类，本位和变位逻辑写在同一个文件中。不复用整枚刻印的逻辑，只复用工具函数。本位广播事件，变位监听响应，两者完全解耦。三个功能槽各有一套本位逻辑，变位只做一套通用于所有槽位。基类提供通用工具函数供刻印调用（碰撞检测、生成物生成、AbilityTask 创建等），覆盖绝大多数需求。
 
 #### 9.2.2. 刻印基类使用 UObject 而非 AActor
-刻印无物理实体，由 InventoryComponent 持有，使用 UObject 避免 Actor 生命周期与网络开销。
+刻印在游戏中无物理实体（无Transform、无碰撞、无模型），仅作为逻辑和数据的容器，因此UGlyphBase继承自UObject而非AActor。此举的核心价值在于生命周期管理的简化，UObject可由UGlyphInventoryComponent直接持有，随组件销毁而自动回收，无需经由UWorld调度；同时避免了AActor所附带的Transform、Component、Tick、Replication等与刻印语义无关的系统性开销，使刻印在架构层面保持纯粹的"逻辑物件"身份，符合其作为技能构筑单元的设计初衷。
 
 #### 9.2.3. 工具函数以基类成员函数提供而非独立组件
-通用能力通过 UGlyphBase 成员函数提供，减少组件查找与依赖，蓝图调用更直接。
+工具函数原设计方案为独立的 UObject 组件，由刻印通过 NewObject 创建并持有。实际开发中发现，所有刻印几乎都需要调用这些函数（碰撞检测、生成物生成、AbilityTask 创建），若拆分为组件，则每枚刻印需额外持有组件引用并管理其生命周期，增加内存开销与使用复杂度。决策将工具函数直接作为 UC_GlyphBase 的成员函数提供。刻印基类 UObject 本身已承载逻辑与数据，工具函数本质上是刻印行为的扩展，归属于基类是自然的职责划分。成员函数调用无额外寻址开销，调用方式简洁（直接调用而非 Component->Function()），且无需额外的组件创建与销毁逻辑。
 
 #### 9.2.4. 功能槽 Ability 作为执行壳
-三个功能槽 Ability 不含业务逻辑，仅作 GAS 激活入口，业务逻辑在刻印 UObject 中，保证 GAS 与刻印系统解耦。
+刻印继承UObject而非GameplayAbility，游戏仅提供Attack、Skill、Move三个功能槽Ability作为GAS激活入口。刻印本质是"物品"（可拾取、拖拽、融合、升级、存档），UObject比Ability更适合作为物品载体，且50+刻印若每个都创建一个Ability类将产生大量冗余资产。功能槽Ability为薄壳，激活时调用InventoryComponent->ExecuteSlot(SlotType, this)将自身引用传递给本位刻印，本位刻印通过AbilityRef调用GAS原生函数，能力与Ability方案完全一致。刻印不持有AbilityRef，仅作为函数参数传递，通过IsValid()检测生命周期，无需手动绑定解绑。本位刻印广播事件时不携带AbilityRef，变位通过InventoryComponent获取本位刻印引用进行交互，保持事件系统的纯净性。工具组件封装通用功能，由本位刻印调用（传入AbilityRef），变位通过修改本位状态间接影响执行。
 
 #### 9.2.5. AbilityTask C++ 中转方案
-通过基类工具函数创建 AbilityTask 并立即激活，返回 Task 指针供刻印绑定回调，避免蓝图直接操作 Task 生命周期。
+刻印基类为UObject子类，而AbilityTask的蓝图节点被BlueprintInternalUseOnly元数据限制，只能在UGameplayAbility内部使用，UObject无法直接调用。因此需要在UGlyphBase基类中提供C++级别的中转函数（CreatePlayMontageAndWaitTask、CreateWaitGameplayEventTask等），内部调用GAS原生工厂函数并显式调用ReadyForActivation()激活Task，将Task指针返回给刻印蓝图使用。此举以极小封装成本（每个Task约5行代码）解决了UObject与GAS异步任务之间的调用鸿沟，后续新增AbilityTask只需按相同模式扩展，刻印蓝图可像原生Ability一样绑定Task回调，不破坏刻印的UObject属性（存档、库容、融合能力）。
 
 #### 9.2.6. 变位影响本位的三层优先级设计
-数据修改优先、事件挂载增量次之、管理层覆盖为最后手段，保证本位不知道变位存在，两者完全解耦。
+变位对本位的影响遵循三层优先级设计。第一优先为数据修改，变位通过修改 FGlyphEventContext 中的数值字段（如伤害倍率、投射物数量、速度倍率、投射物类覆盖等）影响本位的执行结果，覆盖约 80% 的变位需求，本位只读取 Context 数据，完全不知道变位的存在。第二优先为事件挂载增量逻辑，变位通过监听本位广播的事件（OnCast、OnHit、OnFinish 等），在 OnEventReceived 中执行额外逻辑（如命中后挂 DOT、触发爆炸、播放特效等），覆盖约 15% 的变位需求。第三优先为管理层覆盖，在极少数需要完全改变本位行为的情况下（约 5%），由 UGlyphInventoryComponent 在 ExecuteSlot 中判断是否由变位接管执行。设计原则是：本位不持有变位引用且不预留逻辑分支；变位通过修改数据或响应事件来影响本位，不直接调用本位内部函数；管理层负责路由决策但不参与业务逻辑；第三优先当前阶段暂不实现，待后续有真实需求时再根据实际案例引入合适的结构（阶段划分或链式结构）。
 
 #### 9.2.7. 蓄力系统设计
-蓄力由 InventoryComponent 统一调度，与 GAS AbilityTask 解耦，Ability 取消时蓄力状态不受影响。
+蓄力系统的设计遵循与刻印系统一致的"数据驱动+事件驱动"原则，核心决策在于不依赖 GAS 的 AbilityTask，而是将蓄力状态交由 UGlyphInventoryComponent 统一调度。理由是刻印本质是 UObject 物品而非 Ability，若为蓄力单独引入 AbilityTask 机制，则每枚刻印的蓄力逻辑将散落在各自 Ability 中，既破坏刻印作为独立单元的封装性，也与"功能槽 Ability 仅作为执行壳"的架构相悖。统一调度确保任意刻印无需额外实现即可获得蓄力能力，符合"刻印作为独立单元"的设计语义。
 
 #### 9.2.8. 元属性伤害处理架构
-伤害通过 ApplyDamageToTarget 统一入口，构建 EffectContext 并附加刻印来源，便于变位与信息素追溯。
+采用元属性（IncomingDamage）+ PostGameplayEffectExecute 处理伤害，而非使用 GE Modifier 或 ExecutionCalculation。因为伤害来源多样（即时技能、DOT、反射、环境陷阱），若每个来源各自处理抗性和减伤，逻辑将分散在多处，新增伤害类型时必须重复实现相同的修饰公式，维护成本和出错风险随项目扩张线性增长。元属性方案通过 IncomingDamage 作为统一数据管道，强制所有伤害来源（无论 ApplyDamageToTarget 还是 DOT 周期 GE）修改同一属性，在 PostGameplayEffectExecute 中汇集所有伤害进行统一修饰。这种多入口单出口模式将抗性、减伤、格挡等公式集中在一处维护，新增伤害来源无需复制任何逻辑。相较于 GE Modifier（逻辑分散至多个 GE）、ExecutionCalculation（逻辑隔离在独立 C++ 类，无法直接复用 AttributeSet 的属性和函数），元属性方案与 AttributeSet 处于同一文件，可直接访问所有抗性属性和 Tag，逻辑内聚且便于调试。
 
 #### 9.2.9. 小怪不套用三槽架构
 小怪为固定设计怪物，行为与外貌固定，降低小怪波复杂度，突出割草爽感；三槽架构保留给 Boss 波刻印怪，形成双段节奏差异。
@@ -744,7 +744,9 @@ Content/
 ### 9.3. 问题修复记录
 
 #### 9.3.1. AbilityTask 激活与清理问题
-修复 AbilityTask 创建后未及时激活或清理导致的回调丢失与内存泄漏。
+在开发过程中，C++ 中创建的 AbilityTask 在技能结束后没有被正确清理，导致内存残留和意外回调触发。该问题主要由 AbilityTask 的激活方式引起，具体描述如下：
+UGameplayAbility 通过 ActiveTasks 数组管理所有关联的 AbilityTask。当技能结束时，EndAbility 会遍历该数组并清理所有任务。AbilityTask 的正确激活流程分为两步：先将自身注册到 ActiveTasks 数组，再执行内部逻辑。在 C++ 中，ReadyForActivation() 函数封装了这一完整流程，而 Activate() 仅执行内部逻辑，不负责注册。开发初期，在 CreateWaitGameplayEventTask 和 CreatePlayMontageAndWaitTask 等工厂函数中直接调用了 Task->Activate()，而非 ReadyForActivation()。这导致创建的 AbilityTask 虽然内部逻辑正常运行，但未被添加到 ActiveTasks 数组中。当技能结束时，EndAbility 遍历 ActiveTasks 数组找不到该任务，跳过了清理步骤，造成任务残留。正确做法是统一使用 ReadyForActivation() 激活所有 AbilityTask。修正后的写法如下：创建 Task 后先判断有效性，再调用 ReadyForActivation()，将注册和激活合并为一步完成。修正后，EndAbility 能够正常清理所有任务，不再需要额外的 ManagedTasks 数组或手动清理逻辑。在开发的其他模块中，凡是涉及 C++ 创建 AbilityTask 的地方，统一遵循此规范。
 
 #### 9.3.2. 第一次播放蓄力蒙太奇无动画
-修复首次蓄力蒙太奇播放无动画的问题，确保蒙太奇数组与蓄力段时间一一对应且首次播放正确初始化。
+在实现蓄力系统时，首次触发蓄力时角色无任何动画表现，蒙太奇未被播放，第二次及之后触发则正常播放。该问题仅在打包后的独立游戏中出现，开发环境中不易复现。
+问题根源在于 AbilityTask_PlayMontageAndWait 的内部行为。该任务通过 Montage_Play 播放蒙太奇，但任务的 Activate() 执行并非同步完成，中间存在帧间隔。首次调用时，蒙太奇资源可能尚未完全流送至内存，AbilityTask 激活过程中的异步注册机制与此冲突，导致 Montage_Play 被跳过或返回 0.0f。由于 AbilityTask 不会在失败后自动重试，第一次播放就此失败，动画不显示。后续调用时资源已在内存中，播放正常。解决方案是将蓄力蒙太奇的播放与 AbilityTask 解耦，不再通过 CreatePlayMontageAndWaitTask 播放蓄力动画。蓄力过程由 UGlyphInventoryComponent 独立管理，通过 AnimInstance->Montage_Play() 直接在动画实例上同步播放蒙太奇，不依赖 AbilityTask 的异步激活流程。UGlyphInventoryComponent 封装了 PlayChargeMontage 和 StopChargeMontage 函数，分别负责蓄力蒙太奇的播放和停止。这些函数获取角色身上的 UAnimInstance 引用，直接调用 Montage_Play 和 Montage_Stop，播放时机由 TickComponent 中以绝对时间差驱动的蓄力逻辑精确控制。此方式绕过了 AbilityTask 的异步注册机制，消除了首次播放时的资源加载时序问题，使蓄力动画能够在第一次触发时即正确播放并循环。
